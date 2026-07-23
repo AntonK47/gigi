@@ -45,16 +45,16 @@ void DispatchLambdaAction(RenderGraphNode& node, const LAMBDA& lambda)
     switch (node._index)
     {
         // clang-format off
-        #include "external/df_serialize/_common.h"
-        #define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION) \
+#include "external/df_serialize/_common.h"
+#define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION) \
             case RenderGraphNode::c_index_##_NAME: \
             { \
                 DispatchLambdaActionInner(node.##_NAME, lambda); \
                 break; \
             }
-        #include "external/df_serialize/_fillunsetdefines.h"
-        #include "Schemas/RenderGraphNodesVariant.h"
-        // clang-format on
+#include "external/df_serialize/_fillunsetdefines.h"
+#include "Schemas/RenderGraphNodesVariant.h"
+// clang-format on
     }
 }
 
@@ -64,16 +64,16 @@ void DispatchLambdaAction(const RenderGraphNode& node, const LAMBDA& lambda)
     switch (node._index)
     {
         // clang-format off
-        #include "external/df_serialize/_common.h"
-        #define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION) \
+#include "external/df_serialize/_common.h"
+#define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION) \
             case RenderGraphNode::c_index_##_NAME: \
             { \
                 DispatchLambdaAction(node.##_NAME, lambda); \
                 break; \
             }
-        #include "external/df_serialize/_fillunsetdefines.h"
-        #include "Schemas/RenderGraphNodesVariant.h"
-        // clang-format on
+#include "external/df_serialize/_fillunsetdefines.h"
+#include "Schemas/RenderGraphNodesVariant.h"
+// clang-format on
     }
 }
 
@@ -83,16 +83,16 @@ void DispatchLambda(RenderGraphNode& node, const LAMBDA& lambda)
     switch (node._index)
     {
         // clang-format off
-        #include "external/df_serialize/_common.h"
-        #define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION) \
+#include "external/df_serialize/_common.h"
+#define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION) \
             case RenderGraphNode::c_index_##_NAME: \
             { \
                 lambda(node.##_NAME); \
                 break; \
             }
-        #include "external/df_serialize/_fillunsetdefines.h"
-        #include "Schemas/RenderGraphNodesVariant.h"
-        // clang-format on
+#include "external/df_serialize/_fillunsetdefines.h"
+#include "Schemas/RenderGraphNodesVariant.h"
+// clang-format on
     }
 }
 
@@ -102,16 +102,16 @@ void DispatchLambda(const RenderGraphNode& node, const LAMBDA& lambda)
     switch (node._index)
     {
         // clang-format off
-        #include "external/df_serialize/_common.h"
-        #define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION) \
+#include "external/df_serialize/_common.h"
+#define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION) \
             case RenderGraphNode::c_index_##_NAME: \
             { \
                 lambda(node.##_NAME); \
                 break; \
             }
-        #include "external/df_serialize/_fillunsetdefines.h"
-        #include "Schemas/RenderGraphNodesVariant.h"
-        // clang-format on
+#include "external/df_serialize/_fillunsetdefines.h"
+#include "Schemas/RenderGraphNodesVariant.h"
+// clang-format on
     }
 }
 
@@ -120,11 +120,11 @@ inline std::string GetNodeTypeName(const RenderGraphNode& node)
     switch (node._index)
     {
         // clang-format off
-        #include "external/df_serialize/_common.h"
-        #define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION)  case RenderGraphNode::c_index_##_NAME: return #_NAME;
-        #include "external/df_serialize/_fillunsetdefines.h"
-        #include "Schemas/RenderGraphNodesVariant.h"
-        // clang-format on
+#include "external/df_serialize/_common.h"
+#define VARIANT_TYPE(_TYPE, _NAME, _DEFAULT, _DESCRIPTION)  case RenderGraphNode::c_index_##_NAME: return #_NAME;
+#include "external/df_serialize/_fillunsetdefines.h"
+#include "Schemas/RenderGraphNodesVariant.h"
+// clang-format on
     }
     GigiAssert(false, "Unhandled node type");
     return "";
@@ -180,16 +180,16 @@ inline bool GetResourceVisibility(const RenderGraphNode& node, ResourceVisibilit
 {
     switch (node._index)
     {
-        case RenderGraphNode::c_index_resourceBuffer:
-        {
-            visibility = node.resourceBuffer.visibility;
-            return true;
-        }
-        case RenderGraphNode::c_index_resourceTexture:
-        {
-            visibility = node.resourceTexture.visibility;
-            return true;
-        }
+    case RenderGraphNode::c_index_resourceBuffer:
+    {
+        visibility = node.resourceBuffer.visibility;
+        return true;
+    }
+    case RenderGraphNode::c_index_resourceTexture:
+    {
+        visibility = node.resourceTexture.visibility;
+        return true;
+    }
     }
 
     return false;
@@ -214,7 +214,7 @@ inline ImColor GetNodeColor(const RenderGraphNode& node)
         return ImColor(255, 255, 255, 200);
     }
 
-	// colors like Frostbite FrameGraph
+    // colors like Frostbite FrameGraph
     // slide 17 https://www.slideshare.net/DICEStudio/framegraph-extensible-rendering-architecture-in-frostbite
     bool isResourceNode = GetNodeIsResourceNode(node);
     return isResourceNode ? ImColor(128, 128, 255, 128) : ImColor(255, 128, 64, 128);
@@ -296,7 +296,7 @@ inline int GetShaderIndexByName(const RenderGraph& renderGraph, ShaderType shade
     return -1;
 }
 
-inline int GetShaderIndexByName(const RenderGraph& renderGraph,const char* name)
+inline int GetShaderIndexByName(const RenderGraph& renderGraph, const char* name)
 {
     return GetShaderIndexByName(renderGraph, ShaderType::Count, name);
 }
@@ -629,12 +629,23 @@ inline std::vector<NodePinInfo> GetNodePins(const RenderGraph& renderGraph, Rend
     // make a pin for indirect draw
     if (node.enableIndirect)
     {
-        pin.name = "indirectBuffer";
-        pin.inputNode = &node.indirectBuffer.node;
-        pin.inputNodePin = &node.indirectBuffer.pin;
-        pin.accessLabel = " (R)";
-        pin.required = false;
-        ret.push_back(pin);
+        {
+            pin.name = "indirectBuffer";
+            pin.inputNode = &node.indirectExecution.indirectBuffer.node;
+            pin.inputNodePin = &node.indirectExecution.indirectBuffer.pin;
+            pin.accessLabel = " (R)";
+            pin.required = false;
+            ret.push_back(pin);
+        }
+        {
+            NodePinInfo pin;
+            pin.name = "indirectCountBuffer";
+            pin.inputNode = &node.indirectExecution.indirectCountBuffer.node;
+            pin.inputNodePin = &node.indirectExecution.indirectCountBuffer.pin;
+            pin.accessLabel = " (R)";
+            pin.required = false;
+            ret.push_back(pin);
+        }
     }
 
     // Vertex Buffer
@@ -711,8 +722,8 @@ inline std::vector<NodePinInfo> GetNodePins(const RenderGraph& renderGraph, Rend
             for (NodePinInfo& pinInfo : ret)
             {
                 if (pinInfo.isInput)
-                    node.inputPinIds.insert(std::make_pair( pinInfo.name, -1 ));
-                node.outputPinIds.insert(std::make_pair( pinInfo.name, -1 ));
+                    node.inputPinIds.insert(std::make_pair(pinInfo.name, -1));
+                node.outputPinIds.insert(std::make_pair(pinInfo.name, -1));
             }
         }
     );
@@ -813,10 +824,10 @@ inline std::vector<NodePinInfo> GetNodePins(const RenderGraph& renderGraph, Rend
 
     std::vector<NodePinInfo> result(1);
 
-	result[0].name = node.connections[0].srcPin;
-	result[0].inputNode = &node.connections[0].dstNode;
-	result[0].inputNodePin = &node.connections[0].dstPin;
-	result[0].accessLabel = "";
+    result[0].name = node.connections[0].srcPin;
+    result[0].inputNode = &node.connections[0].dstNode;
+    result[0].inputNodePin = &node.connections[0].dstPin;
+    result[0].accessLabel = "";
     result[0].required = false;
 
     return result;

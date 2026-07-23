@@ -313,7 +313,7 @@ inline bool ReadFromJSON_PostLoad(RenderGraph& renderGraph)
                 case RenderGraphNode::c_index_actionDrawCall:
                 {
                     RenderGraphNode_Action_DrawCall& ref = node.actionDrawCall;
-                    if (!ref.indirectBuffer.pin.empty())
+                    if (!ref.indirectExecution.indirectBuffer.pin.empty())
                         ref.enableIndirect = true;
                 }
                 break;

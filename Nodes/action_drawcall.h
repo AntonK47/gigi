@@ -15,8 +15,8 @@ namespace FrontEndNodes
         ret += node.pixelShader.shader ? (int)node.pixelShader.shader->resources.size() : 0;
         ret += node.amplificationShader.shader ? (int)node.amplificationShader.shader->resources.size() : 0;
         ret += node.meshShader.shader ? (int)node.meshShader.shader->resources.size() : 0;
-        
-        if(node.enableIndirect)
+
+        if (node.enableIndirect)
             ++ret; // Indirect dispatch buffer
 
         ret +=
@@ -72,6 +72,10 @@ namespace FrontEndNodes
         {
             if (pinIndex == 0)
                 return "indirectBuffer";
+            pinIndex--;
+
+            if (pinIndex == 0)
+                return "indirectCountBuffer";
             pinIndex--;
         }
 
@@ -227,12 +231,24 @@ namespace FrontEndNodes
             if (pinIndex == 0)
             {
                 ret.access = ShaderResourceAccessType::Indirect;
-                ret.nodeIndex = node.indirectBuffer.nodeIndex;
-                ret.pinIndex = node.indirectBuffer.nodePinIndex;
+                ret.nodeIndex = node.indirectExecution.indirectBuffer.nodeIndex;
+                ret.pinIndex = node.indirectExecution.indirectBuffer.nodePinIndex;
                 ret.required = false;
                 return ret;
             }
             pinIndex--;
+
+
+            if (pinIndex == 0)
+            {
+
+                ret.access = ShaderResourceAccessType::Indirect;
+                ret.nodeIndex = node.indirectExecution.indirectCountBuffer.nodeIndex;
+                ret.pinIndex = node.indirectExecution.indirectCountBuffer.nodePinIndex;
+                ret.required = false;
+            }
+            pinIndex--;
+
         }
 
         // Optional vertex buffer

@@ -418,6 +418,17 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_WorkGraph, RenderGraphNode_ActionBas
     STRUCT_DYNAMIC_ARRAY(ShaderDefine, defines, "The defines the shaders ares compiled with, on top of whatever defines the shaders have already", SCHEMA_FLAG_UI_COLLAPSABLE)
 STRUCT_END()
 
+STRUCT_BEGIN(IndirectExecution, "Indirect execution parameters.")
+    STRUCT_FIELD(NodePinReferenceOptional, indirectBuffer, {}, "If given, this buffer will be used as an indirect dispatch buffer, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
+    STRUCT_FIELD(NodePinReferenceOptional, indirectCountBuffer, {}, "If given, this buffer will be used as an indirect count buffer, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
+    STRUCT_FIELD(VariableReference, indirectOffsetVariable, {}, "If a variable is given, it will be used as the offset into the indirect dispatch buffer. 0 would be the start of the buffer, 1 would start at the 4th value in the buffer, and so on.", 0)
+    STRUCT_FIELD(int, indirectOffsetValue, 0, "The offset into the indirect dispatch buffer if no variable given.  0 would be the start of the buffer, 1 would start at the 4th value in the buffer, and so on.", 0)
+    STRUCT_FIELD(VariableReference, indirectMaxCountVariable, {}, "If a variable is given, it will be used as the max count for indirect dispatching.", 0)
+    STRUCT_FIELD(int, indirectMaxCountValue, 1, "The count of indirect arguments.", 0)
+    STRUCT_FIELD(VariableReference, indirectCountOffsetVariable, {}, "If a variable is given, it will be used as the offset into indirect count buffer for indirect dispatching.", 0)
+    STRUCT_FIELD(int, indirectCountOffsetValue, 0, "The offsets in UINT into the indirect count buffer if no variable is given", 0)
+STRUCT_END()
+
 STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_DrawCall, RenderGraphNode_ActionBase, "Rasterization")
     STRUCT_CONST(std::string, c_editorName, "Draw Call", "Used by the editor.", SCHEMA_FLAG_NO_SERIALIZE)
     STRUCT_CONST(std::string, c_shortTypeName, "Draw", "Used by the editor.", SCHEMA_FLAG_NO_SERIALIZE)
@@ -433,8 +444,8 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_DrawCall, RenderGraphNode_ActionBase
     STRUCT_FIELD(PixelShaderReference, pixelShader, {}, "The pixel shader.", 0)
     STRUCT_FIELD(ShaderVariableAliases, pixelShaderVariableAliases, {}, "", 0)
 
-    STRUCT_FIELD(NodePinReferenceOptional, indirectBuffer, {}, "Indirect buffer to make this draw use ExecuteIndirect, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
-    STRUCT_FIELD(NodePinReferenceOptional, indirectBufferCounter, {}, "Indirect buffer count", SCHEMA_FLAG_NO_UI)
+    //Indirect ecexution specific
+    STRUCT_FIELD(IndirectExecution, indirectExecution, {}, "Indirect execution settings.", SCHEMA_FLAG_UI_COLLAPSABLE)
 
     // Vertex shader specific
     STRUCT_FIELD(int, countPerInstance, -1, "If using an index buffer, this is indexCountPerInstance, else is vertexCountPerInstance.  If -1, will use the count of the buffer.  Else, if a buffer is given, will use min(buffer count, countPerInstance).", 0)

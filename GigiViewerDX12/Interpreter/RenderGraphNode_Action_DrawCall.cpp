@@ -1505,10 +1505,10 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 		// If using a mesh shader, do a DispatchMesh call
 		if (node.meshShader.shader)
 		{
-            if (node.enableIndirect && node.indirectBuffer.resourceNodeIndex != -1)
+            if (node.enableIndirect && node.indirectExecution.indirectBuffer.resourceNodeIndex != -1)
             {
                 ss << "Draw: Indirect";
-                const std::string& indirectBufferName = m_renderGraph.nodes[node.indirectBuffer.resourceNodeIndex].resourceBuffer.name;
+                const std::string& indirectBufferName = m_renderGraph.nodes[node.indirectExecution.indirectBuffer.resourceNodeIndex].resourceBuffer.name;
                 bool exists = false;
                 const RuntimeTypes::RenderGraphNode_Resource_Buffer& resourceInfo = GetRuntimeNodeData_RenderGraphNode_Resource_Buffer(indirectBufferName.c_str(), exists);
                 if (!exists)
@@ -1643,10 +1643,10 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
             }
 		}
 		// else if we have an indirect buffer, do indirect
-		else if (node.enableIndirect && node.indirectBuffer.resourceNodeIndex != -1)
+		else if (node.enableIndirect && node.indirectExecution.indirectBuffer.resourceNodeIndex != -1)
 		{
 			ss << "Draw: Indirect";
-			const std::string& indirectBufferName = m_renderGraph.nodes[node.indirectBuffer.resourceNodeIndex].resourceBuffer.name;
+			const std::string& indirectBufferName = m_renderGraph.nodes[node.indirectExecution.indirectBuffer.resourceNodeIndex].resourceBuffer.name;
 			bool exists = false;
 			const RuntimeTypes::RenderGraphNode_Resource_Buffer& resourceInfo = GetRuntimeNodeData_RenderGraphNode_Resource_Buffer(indirectBufferName.c_str(), exists);
 			if (!exists)
@@ -1659,31 +1659,105 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 			if (!resourceInfo.m_resource)
 				return true;
 
+
+            bool indirectCountBufferExists = false;
+            ID3D12Resource* indirectCountBufferResource = nullptr;
+
+            if (node.indirectExecution.indirectCountBuffer.resourceNodeIndex != -1)
+            {
+                // Get the indirect count buffer and publish it as a viewable resource if the resource differ form the indirect buffer
+                const std::string& indirectCountBufferName = m_renderGraph.nodes[node.indirectExecution.indirectCountBuffer.resourceNodeIndex].resourceBuffer.name;
+
+                const RuntimeTypes::RenderGraphNode_Resource_Buffer& indirectCountBufferResourceInfo = GetRuntimeNodeData_RenderGraphNode_Resource_Buffer(indirectCountBufferName.c_str(), indirectCountBufferExists);
+
+                // Note: It might be handy to publish the resource even if the resource is the same as indirect buffer resource.
+                if (indirectCountBufferExists && indirectCountBufferResourceInfo.m_resource != resourceInfo.m_resource)
+                {
+                    std::string indirectCountBufferLabel = node.name + std::string(".indirectCountBuffer") + std::string(": ") + indirectCountBufferName;
+                    runtimeData.HandleViewableBuffer(*this, indirectCountBufferLabel.c_str(), indirectCountBufferResourceInfo.m_resource, indirectCountBufferResourceInfo.m_format, indirectCountBufferResourceInfo.m_formatCount, indirectCountBufferResourceInfo.m_structIndex, indirectCountBufferResourceInfo.m_size, indirectCountBufferResourceInfo.m_stride, indirectCountBufferResourceInfo.m_count, false, false, 0, 0, false);
+                }
+
+                indirectCountBufferResource = indirectCountBufferResourceInfo.m_resource;
+            }
+
+
 			// Note: maybe this could move earlier, so there isn't an extra transition call here. like in the descriptor table logic even though it doesn't go in the descriptor table?
 			m_transitions.Transition(TRANSITION_DEBUG_INFO(resourceInfo.m_resource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
 			m_transitions.Flush(m_commandList);
+
+
+            m_transitions.Transition(TRANSITION_DEBUG_INFO(resourceInfo.m_resource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
+
+            if (indirectCountBufferExists && indirectCountBufferResource != resourceInfo.m_resource)
+            {
+                m_transitions.Transition(TRANSITION_DEBUG_INFO(indirectCountBufferResource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
+            }
+            m_transitions.Flush(m_commandList);
+
+            // Get the indirect buffer offset
+            UINT64 argumentBufferOffset = node.indirectExecution.indirectOffsetValue;
+            if (node.indirectExecution.indirectOffsetVariable.variableIndex != -1)
+            {
+                GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectOffsetVariable.variableIndex);
+                switch (rtVar.variable->type)
+                {
+                case DataFieldType::Int:
+                {
+                    argumentBufferOffset = static_cast<UINT64>(*(int*)rtVar.storage.value);
+                    break;
+                }
+                default:
+                {
+                    m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Offset variable \"%s\" in compute shader node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
+                    return false;
+                }
+                }
+            }
+
+            // Get the indirect count buffer offset
+            UINT64 argumentCountBufferOffset = node.indirectExecution.indirectCountOffsetValue;
+            if (node.indirectExecution.indirectCountOffsetVariable.variableIndex != -1)
+            {
+                GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectCountOffsetVariable.variableIndex);
+                switch (rtVar.variable->type)
+                {
+                case DataFieldType::Int:
+                {
+                    argumentCountBufferOffset = static_cast<UINT64>(*(int*)rtVar.storage.value);
+                    break;
+                }
+                default:
+                {
+                    m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Count Offset variable \"%s\" in compute shader node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
+                    return false;
+                }
+                }
+            }
+
+            const UINT maxCommandCount = static_cast<UINT>((std::max)({ node.indirectExecution.indirectMaxCountValue, 1 }));
+
 
 			if (node.indexBuffer.resourceNodeIndex != -1)
 			{
 				ss << "DrawIndexedInstanced";
 				m_commandList->ExecuteIndirect(
 					m_commandSignatureDrawIndexed,
-					1,
+                    maxCommandCount,
 					resourceInfo.m_resource,
-					0,
-					nullptr,
-					0);
+                    argumentBufferOffset * sizeof(D3D12_DRAW_INDEXED_ARGUMENTS),
+                    indirectCountBufferResource,
+                    argumentCountBufferOffset * sizeof(UINT));
 			}
 			else
 			{
 				ss << "DrawInstanced";
 				m_commandList->ExecuteIndirect(
 					m_commandSignatureDraw,
-					1,
+                    maxCommandCount,
 					resourceInfo.m_resource,
-					0,
-					nullptr,
-					0);
+					argumentBufferOffset * sizeof(D3D12_DRAW_ARGUMENTS),
+					indirectCountBufferResource,
+                    argumentCountBufferOffset * sizeof(UINT));
 			}
 		}
 		// else do direct
