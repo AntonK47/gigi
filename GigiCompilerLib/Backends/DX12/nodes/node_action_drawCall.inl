@@ -59,6 +59,10 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
         "\n        ID3D12RootSignature* drawCall_" << node.name << "_rootSig = nullptr;"
         ;
 
+    stringReplacementMap["/*$(ContextInternal)*/"] <<
+        "\n        ID3D12CommandSignature* drawCall_" << node.name << "_commandSig;"
+        ;
+
     // Creation
     stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
         "\n"
@@ -451,6 +455,34 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
         "\n            if (c_debugNames)"
         "\n                m_internal.drawCall_" << node.name << "_rootSig->SetName(L\"" << node.name << "\");"
         ;
+
+    // Command signature
+    if (node.indexBuffer.resourceNodeIndex != -1)
+    {
+        stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+            "\n"
+            "\n            {"
+            "\n                D3D12_INDIRECT_ARGUMENT_DESC argDescs[1];"
+            "\n                argDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW ;"
+            "\n"
+            "\n                if(!DX12Utils::MakeCommandSig(device, argDescs, 1, sizeof(D3D12_DRAW_ARGUMENTS), m_internal.drawCall_" << node.name << "_rootSig, &m_internal.drawCall_" << node.name << "_commandSig, (c_debugNames ? L\"" << node.name << "\" : nullptr), Context::LogFn))"
+            "\n                return false;"
+            "\n            }"
+            ;
+    }
+    else
+    {
+        stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+            "\n"
+            "\n            {"
+            "\n                D3D12_INDIRECT_ARGUMENT_DESC argDescs[1];"
+            "\n                argDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED ;"
+            "\n"
+            "\n                if(!DX12Utils::MakeCommandSig(device, argDescs, 1, sizeof(D3D12_DRAW_INDEXED_ARGUMENTS), m_internal.drawCall_" << node.name << "_rootSig, &m_internal.drawCall_" << node.name << "_commandSig, (c_debugNames ? L\"" << node.name << "\" : nullptr), Context::LogFn))"
+            "\n                return false;"
+            "\n            }"
+            ;
+    }
 
     // Shaders
     const char* shaderCompiler = (renderGraph.settings.dx12.shaderCompiler == DXShaderCompiler::DXC) ? "_DXC" : "_FXC";
@@ -2161,21 +2193,173 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             "\n            }"
             ;
     }
-    // If we have an index buffer, do DrawIndexedInstanced
-    else if (node.indexBuffer.resourceNodeIndex != -1)
+    else if(node.enableIndirect)
     {
-        stringReplacementMap["/*$(Execute)*/"] <<
-            "\n"
-            "\n            commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, 0, 0, 0);"
-            ;
+        // Indirect exection
+        int indirectBufferResourceNodeIndex = node.enableIndirect ? node.indirectExecution.indirectBuffer.nodeIndex : -1;
+        if (indirectBufferResourceNodeIndex != -1)
+        {
+            if (!GetNodeIsResourceNode(renderGraph.nodes[indirectBufferResourceNodeIndex]))
+                indirectBufferResourceNodeIndex = GetResourceNodeForPin(renderGraph, indirectBufferResourceNodeIndex, node.indirectExecution.indirectBuffer.nodePinIndex);
+
+            GigiAssert(indirectBufferResourceNodeIndex != -1, "Could not find resource node for indirect dispatch");
+            GigiAssert(renderGraph.nodes[indirectBufferResourceNodeIndex]._index == RenderGraphNode::c_index_resourceBuffer, "Error");
+            RenderGraphNode_Resource_Buffer& bufferNode = renderGraph.nodes[indirectBufferResourceNodeIndex].resourceBuffer;
+
+            if (node.indirectExecution.indirectOffsetVariable.variableIndex != -1)
+            {
+                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectOffsetVariable.variableIndex];
+                if (variable.type == DataFieldType::Int)
+                {
+                    stringReplacementMap["/*$(Execute)*/"] <<
+                        "\n"
+                        "\n            int executeIndirectOffset = " << VariableToString(variable, renderGraph) << ";"
+                        ;
+                }
+                else
+                {
+                    GigiAssert(false, "Unhandled data type \"%s\" for Indirect Offset variable \"%s\" in compute shader node \"%s\"", EnumToString(variable.type), variable.name.c_str(), node.name.c_str());
+                }
+            }
+            else
+            {
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n            int executeIndirectOffset = " << node.indirectExecution.indirectOffsetValue << ";"
+                    ;
+            }
+
+            if (node.indirectExecution.indirectMaxCountVariable.variableIndex != -1)
+            {
+                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectMaxCountVariable.variableIndex];
+                if (variable.type == DataFieldType::Int)
+                {
+                    stringReplacementMap["/*$(Execute)*/"] <<
+                        "\n"
+                        "\n            int executeIndirectMaxCount = " << VariableToString(variable, renderGraph) << ";"
+                        ;
+                }
+                else
+                {
+                    GigiAssert(false, "Unhandled data type \"%s\" for Indirect Max Count variable \"%s\" in compute shader node \"%s\"", EnumToString(variable.type), variable.name.c_str(), node.name.c_str());
+                }
+            }
+            else
+            {
+                if (node.indirectExecution.indirectMaxCountValue >= 0)
+                {
+                    stringReplacementMap["/*$(Execute)*/"] <<
+                        "\n"
+                        "\n            int executeIndirectMaxCount = " << node.indirectExecution.indirectMaxCountValue << ";"
+                        ;
+                }
+                else
+                {
+                    GigiAssert(false, "indirectMaxCountValue must be >= 0");
+                }
+            }
+
+            if (node.indirectExecution.indirectCountOffsetVariable.variableIndex != -1)
+            {
+                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectCountOffsetVariable.variableIndex];
+                if (variable.type == DataFieldType::Int)
+                {
+                    stringReplacementMap["/*$(Execute)*/"] <<
+                        "\n"
+                        "\n            int executeIndirectCountOffset = " << VariableToString(variable, renderGraph) << ";"
+                        ;
+                }
+                else
+                {
+                    GigiAssert(false, "Unhandled data type \"%s\" for Indirect Count Offset variable \"%s\" in compute shader node \"%s\"", EnumToString(variable.type), variable.name.c_str(), node.name.c_str());
+                }
+            }
+            else
+            {
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n            int executeIndirectCountOffset = " << node.indirectExecution.indirectCountOffsetValue << ";"
+                    ;
+            }
+
+            int indirectCountBufferResourceNodeIndex = node.enableIndirect ? node.indirectExecution.indirectCountBuffer.nodeIndex : -1;
+            if (indirectCountBufferResourceNodeIndex != -1)
+            {
+                if (!GetNodeIsResourceNode(renderGraph.nodes[indirectCountBufferResourceNodeIndex]))
+                    indirectCountBufferResourceNodeIndex = GetResourceNodeForPin(renderGraph, indirectCountBufferResourceNodeIndex, node.indirectExecution.indirectCountBuffer.nodePinIndex);
+
+                GigiAssert(indirectCountBufferResourceNodeIndex != -1, "Could not find resource node for indirect count dispatch");
+                GigiAssert(renderGraph.nodes[indirectCountBufferResourceNodeIndex]._index == RenderGraphNode::c_index_resourceBuffer, "Error");
+                RenderGraphNode_Resource_Buffer& counterBufferNode = renderGraph.nodes[indirectCountBufferResourceNodeIndex].resourceBuffer;
+
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n            ID3D12Resource* counterBuffer = context->" << GetResourceNodePathInContext(counterBufferNode.visibility) << "buffer_" << counterBufferNode.name.c_str() << ";"
+                    ;
+            }
+            else
+            {
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n            ID3D12Resource* counterBuffer = nullptr;"
+                    ;
+            }
+
+            RenderGraphNode_Resource_Buffer& indirectBufferNode = renderGraph.nodes[node.indirectExecution.indirectBuffer.nodeIndex].resourceBuffer;
+
+            stringReplacementMap["/*$(Execute)*/"] <<
+                "\n"
+                "\n            ID3D12Resource* indirectArgumentBuffer = context->" << GetResourceNodePathInContext(indirectBufferNode.visibility) << "buffer_" << indirectBufferNode.name.c_str() << ";"
+                ;
+
+            // If we have an index buffer, do DrawIndexedInstanced
+            if (node.indexBuffer.resourceNodeIndex != -1)
+            {
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n        commandList->ExecuteIndirect("
+                    "\n            m_internal.drawCall_" << node.name << "_commandSig,"
+                    "\n            executeIndirectMaxCount,"
+                    "\n            indirectArgumentBuffer,"
+                    "\n            executeIndirectOffset * sizeof(D3D12_DRAW_INDEXED_ARGUMENTS),"
+                    "\n            counterBuffer,"
+                    "\n            executeIndirectCountOffset * sizeof(UINT));"
+                    ;
+            }
+            // else do DrawInstanced
+            else
+            {
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n        commandList->ExecuteIndirect("
+                    "\n            m_internal.drawCall_" << node.name << "_commandSig,"
+                    "\n            executeIndirectMaxCount,"
+                    "\n            indirectArgumentBuffer,"
+                    "\n            executeIndirectOffset * sizeof(D3D12_DRAW_ARGUMENTS),"
+                    "\n            counterBuffer,"
+                    "\n            executeIndirectCountOffset * sizeof(UINT));"
+                    ;
+            }
+        }
     }
-    // else do DrawInstanced
     else
     {
-        stringReplacementMap["/*$(Execute)*/"] <<
-            "\n"
-            "\n            commandList->DrawInstanced(vertexCountPerInstance, instanceCount, 0, 0);"
-            ;
+        // If we have an index buffer, do DrawIndexedInstanced
+        if (node.indexBuffer.resourceNodeIndex != -1)
+        {
+            stringReplacementMap["/*$(Execute)*/"] <<
+                "\n"
+                "\n            commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, 0, 0, 0);"
+                ;
+        }
+        // else do DrawInstanced
+        else
+        {
+            stringReplacementMap["/*$(Execute)*/"] <<
+                "\n"
+                "\n            commandList->DrawInstanced(vertexCountPerInstance, instanceCount, 0, 0);"
+                ;
+        }
     }
 
     // Clear the shading rate and shading rate image
