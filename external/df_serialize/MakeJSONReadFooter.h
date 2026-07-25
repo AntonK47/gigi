@@ -145,8 +145,8 @@ inline bool ReadFromJSON_PostLoad(RenderGraph& renderGraph)
                         }
                     }
                     hitGroupNameIndex++;
-                }
-                while(hitGroupNameExists);
+                } 
+                while (hitGroupNameExists);
 
                 // Create a new hit group for this shader
                 {
@@ -313,14 +313,39 @@ inline bool ReadFromJSON_PostLoad(RenderGraph& renderGraph)
                 case RenderGraphNode::c_index_actionDrawCall:
                 {
                     RenderGraphNode_Action_DrawCall& ref = node.actionDrawCall;
-                    if (!ref.indirectExecution.indirectBuffer.pin.empty())
+
+                    if (!ref.indirectBuffer.pin.empty())
+                    {
                         ref.enableIndirect = true;
+                    }
                 }
                 break;
                 }
             }
 
             renderGraph.version = "1.01";
+        }
+        else if (renderGraph.version == "1.01")
+        {
+            // version 1.02 moved "indirectBuffer" in "indirectExecution" struct, we need to remap "indirectBuffer" pin
+            for (RenderGraphNode& node : renderGraph.nodes)
+            {
+                switch (node._index)
+                {
+                case RenderGraphNode::c_index_actionDrawCall:
+                {
+                    RenderGraphNode_Action_DrawCall& ref = node.actionDrawCall;
+
+                    if (!ref.indirectBuffer.pin.empty())
+                    {
+                        ref.indirectExecution.indirectBuffer = ref.indirectBuffer;
+                    }
+                }
+                break;
+                }
+            }
+
+            renderGraph.version = "1.02";
         }
         else
         {
@@ -399,7 +424,7 @@ inline bool RebuildConnections_PostLoad(RenderGraph& renderGraph)
     return true;
 }
 
-inline void BuildConnections(const RenderGraph& renderGraph, int shaderIndex, std::vector<NodePinConnection>& newConnections ,const std::vector<NodePinConnection>& oldConnections)
+inline void BuildConnections(const RenderGraph& renderGraph, int shaderIndex, std::vector<NodePinConnection>& newConnections, const std::vector<NodePinConnection>& oldConnections)
 {
     if (shaderIndex > -1 && shaderIndex < renderGraph.shaders.size())
     {

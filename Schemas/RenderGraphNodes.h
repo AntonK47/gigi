@@ -444,6 +444,9 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_DrawCall, RenderGraphNode_ActionBase
     STRUCT_FIELD(PixelShaderReference, pixelShader, {}, "The pixel shader.", 0)
     STRUCT_FIELD(ShaderVariableAliases, pixelShaderVariableAliases, {}, "", 0)
 
+    //NOTE: this field exists only for backward compartability reasoans, use indirect execution insteed
+    STRUCT_FIELD(NodePinReferenceOptional, indirectBuffer, {}, "Indirect buffer to make this draw use ExecuteIndirect, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
+
     //Indirect ecexution specific
     STRUCT_FIELD(IndirectExecution, indirectExecution, {}, "Indirect execution settings.", SCHEMA_FLAG_UI_COLLAPSABLE)
 

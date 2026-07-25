@@ -3,7 +3,7 @@
 //        Copyright (c) 2024 Electronic Arts Inc. All rights reserved.       //
 ///////////////////////////////////////////////////////////////////////////////
 
-#define GIGI_VERSION() "1.01"
+#define GIGI_VERSION() "1.02"
 #define GIGI_VERSION_WITH_BUILD_NUMBER() GIGI_VERSION() ".11"
 
 // This is independent of GIGI_VERSION().
