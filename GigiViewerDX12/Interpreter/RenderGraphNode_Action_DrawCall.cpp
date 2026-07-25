@@ -1695,10 +1695,10 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
             m_transitions.Flush(m_commandList);
 
             // Get the indirect buffer offset
-            UINT64 argumentBufferOffset = node.indirectExecution.indirectOffsetValue;
-            if (node.indirectExecution.indirectOffsetVariable.variableIndex != -1)
+            UINT64 argumentBufferOffset = node.indirectExecution.indirectOffset.value;
+            if (node.indirectExecution.indirectOffset.variable.variableIndex != -1)
             {
-                GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectOffsetVariable.variableIndex);
+                GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectOffset.variable.variableIndex);
                 switch (rtVar.variable->type)
                 {
                 case DataFieldType::Int:
@@ -1715,10 +1715,10 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
             }
 
             // Get the indirect count buffer offset
-            UINT64 argumentCountBufferOffset = node.indirectExecution.indirectCountOffsetValue;
-            if (node.indirectExecution.indirectCountOffsetVariable.variableIndex != -1)
+            UINT64 argumentCountBufferOffset = node.indirectExecution.indirectCountOffset.value;
+            if (node.indirectExecution.indirectCountOffset.variable.variableIndex != -1)
             {
-                GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectCountOffsetVariable.variableIndex);
+                GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectCountOffset.variable.variableIndex);
                 switch (rtVar.variable->type)
                 {
                 case DataFieldType::Int:
@@ -1734,7 +1734,7 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
                 }
             }
 
-            const UINT maxCommandCount = static_cast<UINT>((std::max)({ node.indirectExecution.indirectMaxCountValue, 1 }));
+            const UINT maxCommandCount = static_cast<UINT>((std::max)({ node.indirectExecution.indirectMaxCount.value, 1u }));
 
 
 			if (node.indexBuffer.resourceNodeIndex != -1)

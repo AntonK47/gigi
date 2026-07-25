@@ -2206,9 +2206,9 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             GigiAssert(renderGraph.nodes[indirectBufferResourceNodeIndex]._index == RenderGraphNode::c_index_resourceBuffer, "Error");
             RenderGraphNode_Resource_Buffer& bufferNode = renderGraph.nodes[indirectBufferResourceNodeIndex].resourceBuffer;
 
-            if (node.indirectExecution.indirectOffsetVariable.variableIndex != -1)
+            if (node.indirectExecution.indirectOffset.variable.variableIndex != -1)
             {
-                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectOffsetVariable.variableIndex];
+                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectOffset.variable.variableIndex];
                 if (variable.type == DataFieldType::Int)
                 {
                     stringReplacementMap["/*$(Execute)*/"] <<
@@ -2225,13 +2225,13 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             {
                 stringReplacementMap["/*$(Execute)*/"] <<
                     "\n"
-                    "\n            int executeIndirectOffset = " << node.indirectExecution.indirectOffsetValue << ";"
+                    "\n            int executeIndirectOffset = " << node.indirectExecution.indirectOffset.value << ";"
                     ;
             }
 
-            if (node.indirectExecution.indirectMaxCountVariable.variableIndex != -1)
+            if (node.indirectExecution.indirectMaxCount.variable.variableIndex != -1)
             {
-                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectMaxCountVariable.variableIndex];
+                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectMaxCount.variable.variableIndex];
                 if (variable.type == DataFieldType::Int)
                 {
                     stringReplacementMap["/*$(Execute)*/"] <<
@@ -2246,11 +2246,11 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             }
             else
             {
-                if (node.indirectExecution.indirectMaxCountValue >= 0)
+                if (node.indirectExecution.indirectMaxCount.value >= 0)
                 {
                     stringReplacementMap["/*$(Execute)*/"] <<
                         "\n"
-                        "\n            int executeIndirectMaxCount = " << node.indirectExecution.indirectMaxCountValue << ";"
+                        "\n            int executeIndirectMaxCount = " << node.indirectExecution.indirectMaxCount.value << ";"
                         ;
                 }
                 else
@@ -2259,9 +2259,9 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                 }
             }
 
-            if (node.indirectExecution.indirectCountOffsetVariable.variableIndex != -1)
+            if (node.indirectExecution.indirectCountOffset.variable.variableIndex != -1)
             {
-                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectCountOffsetVariable.variableIndex];
+                const Variable& variable = renderGraph.variables[node.indirectExecution.indirectCountOffset.variable.variableIndex];
                 if (variable.type == DataFieldType::Int)
                 {
                     stringReplacementMap["/*$(Execute)*/"] <<
@@ -2278,7 +2278,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             {
                 stringReplacementMap["/*$(Execute)*/"] <<
                     "\n"
-                    "\n            int executeIndirectCountOffset = " << node.indirectExecution.indirectCountOffsetValue << ";"
+                    "\n            int executeIndirectCountOffset = " << node.indirectExecution.indirectCountOffset.value << ";"
                     ;
             }
 
