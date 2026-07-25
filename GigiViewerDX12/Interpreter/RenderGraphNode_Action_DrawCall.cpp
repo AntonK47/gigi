@@ -1701,14 +1701,14 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
                 GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectOffset.variable.variableIndex);
                 switch (rtVar.variable->type)
                 {
-                case DataFieldType::Int:
+                case DataFieldType::Uint:
                 {
-                    argumentBufferOffset = static_cast<UINT64>(*(int*)rtVar.storage.value);
+                    argumentBufferOffset = static_cast<UINT64>(*(UINT*)rtVar.storage.value);
                     break;
                 }
                 default:
                 {
-                    m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Offset variable \"%s\" in compute shader node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
+                    m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Offset variable \"%s\" in draw node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
                     return false;
                 }
                 }
@@ -1721,20 +1721,37 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
                 GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectCountOffset.variable.variableIndex);
                 switch (rtVar.variable->type)
                 {
-                case DataFieldType::Int:
+                case DataFieldType::Uint:
                 {
-                    argumentCountBufferOffset = static_cast<UINT64>(*(int*)rtVar.storage.value);
+                    argumentCountBufferOffset = static_cast<UINT64>(*(UINT*)rtVar.storage.value);
                     break;
                 }
                 default:
                 {
-                    m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Count Offset variable \"%s\" in compute shader node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
+                    m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Count Offset variable \"%s\" in draw node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
                     return false;
                 }
                 }
             }
 
-            const UINT maxCommandCount = static_cast<UINT>((std::max)({ node.indirectExecution.indirectMaxCount.value, 1u }));
+            UINT maxCommandCount = static_cast<UINT>((std::max)({ node.indirectExecution.indirectMaxCount.value, 1u }));
+            if (node.indirectExecution.indirectMaxCount.variable.variableIndex != -1)
+            {
+                GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectMaxCount.variable.variableIndex);
+                switch (rtVar.variable->type)
+                {
+                case DataFieldType::Uint:
+                {
+                    maxCommandCount = *(UINT*)rtVar.storage.value;
+                    break;
+                }
+                default:
+                {
+                    m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Max Count variable \"%s\" in draw node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
+                    return false;
+                }
+                }
+            }
 
 
 			if (node.indexBuffer.resourceNodeIndex != -1)

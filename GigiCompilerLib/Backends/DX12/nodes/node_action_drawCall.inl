@@ -222,14 +222,14 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
 
             switch (resource.access)
             {
-                case ShaderResourceAccessType::UAV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesVertex[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;"; break;
-                case ShaderResourceAccessType::RTScene:
-                case ShaderResourceAccessType::SRV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesVertex[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;"; break;
-                case ShaderResourceAccessType::CBV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesVertex[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;"; break;
-                default:
-                {
-                    GigiAssert(false, "Unhandled resource access type: %i", resource.access);
-                }
+            case ShaderResourceAccessType::UAV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesVertex[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;"; break;
+            case ShaderResourceAccessType::RTScene:
+            case ShaderResourceAccessType::SRV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesVertex[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;"; break;
+            case ShaderResourceAccessType::CBV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesVertex[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;"; break;
+            default:
+            {
+                GigiAssert(false, "Unhandled resource access type: %i", resource.access);
+            }
             }
 
             stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
@@ -237,7 +237,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                 "\n            rangesVertex[" << descriptorTableRangeIndex << "].BaseShaderRegister = " << resource.registerIndex << ";"
                 "\n            rangesVertex[" << descriptorTableRangeIndex << "].RegisterSpace = 0;"
                 "\n            rangesVertex[" << descriptorTableRangeIndex << "].OffsetInDescriptorsFromTableStart = " << descriptorTableRangeIndex << ";"
-            ;
+                ;
         }
     }
 
@@ -255,14 +255,14 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
 
             switch (resource.access)
             {
-                case ShaderResourceAccessType::UAV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesPixel[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;"; break;
-                case ShaderResourceAccessType::RTScene:
-                case ShaderResourceAccessType::SRV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesPixel[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;"; break;
-                case ShaderResourceAccessType::CBV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesPixel[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;"; break;
-                default:
-                {
-                    GigiAssert(false, "Unhandled resource access type: %i", resource.access);
-                }
+            case ShaderResourceAccessType::UAV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesPixel[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;"; break;
+            case ShaderResourceAccessType::RTScene:
+            case ShaderResourceAccessType::SRV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesPixel[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;"; break;
+            case ShaderResourceAccessType::CBV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesPixel[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;"; break;
+            default:
+            {
+                GigiAssert(false, "Unhandled resource access type: %i", resource.access);
+            }
             }
 
             stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
@@ -288,14 +288,14 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
 
             switch (resource.access)
             {
-                case ShaderResourceAccessType::UAV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesAmplification[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;"; break;
-                case ShaderResourceAccessType::RTScene:
-                case ShaderResourceAccessType::SRV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesAmplification[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;"; break;
-                case ShaderResourceAccessType::CBV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesAmplification[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;"; break;
-                default:
-                {
-                    GigiAssert(false, "Unhandled resource access type: %i", resource.access);
-                }
+            case ShaderResourceAccessType::UAV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesAmplification[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;"; break;
+            case ShaderResourceAccessType::RTScene:
+            case ShaderResourceAccessType::SRV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesAmplification[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;"; break;
+            case ShaderResourceAccessType::CBV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesAmplification[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;"; break;
+            default:
+            {
+                GigiAssert(false, "Unhandled resource access type: %i", resource.access);
+            }
             }
 
             stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
@@ -321,14 +321,14 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
 
             switch (resource.access)
             {
-                case ShaderResourceAccessType::UAV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesMesh[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;"; break;
-                case ShaderResourceAccessType::RTScene:
-                case ShaderResourceAccessType::SRV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesMesh[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;"; break;
-                case ShaderResourceAccessType::CBV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesMesh[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;"; break;
-                default:
-                {
-                    GigiAssert(false, "Unhandled resource access type: %i", resource.access);
-                }
+            case ShaderResourceAccessType::UAV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesMesh[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;"; break;
+            case ShaderResourceAccessType::RTScene:
+            case ShaderResourceAccessType::SRV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesMesh[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;"; break;
+            case ShaderResourceAccessType::CBV: stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] << "\n            rangesMesh[" << descriptorTableRangeIndex << "].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_CBV;"; break;
+            default:
+            {
+                GigiAssert(false, "Unhandled resource access type: %i", resource.access);
+            }
             }
 
             stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
@@ -340,7 +340,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
         }
     }
 
-    int rootParamCount = 
+    int rootParamCount =
         (descriptorTableRangeCountVertex > 0 ? 1 : 0) +
         (descriptorTableRangeCountPixel > 0 ? 1 : 0) +
         (descriptorTableRangeCountAmplification > 0 ? 1 : 0) +
@@ -465,7 +465,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             "\n                D3D12_INDIRECT_ARGUMENT_DESC argDescs[1];"
             "\n                argDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW ;"
             "\n"
-            "\n                if(!DX12Utils::MakeCommandSig(device, argDescs, 1, sizeof(D3D12_DRAW_ARGUMENTS), m_internal.drawCall_" << node.name << "_rootSig, &m_internal.drawCall_" << node.name << "_commandSig, (c_debugNames ? L\"" << node.name << "\" : nullptr), Context::LogFn))"
+            "\n                if(!DX12Utils::MakeCommandSig(device, argDescs, 1, sizeof(D3D12_DRAW_ARGUMENTS), nullptr, &m_internal.drawCall_" << node.name << "_commandSig, (c_debugNames ? L\"" << node.name << "\" : nullptr), Context::LogFn))"
             "\n                return false;"
             "\n            }"
             ;
@@ -478,7 +478,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             "\n                D3D12_INDIRECT_ARGUMENT_DESC argDescs[1];"
             "\n                argDescs[0].Type = D3D12_INDIRECT_ARGUMENT_TYPE_DRAW_INDEXED ;"
             "\n"
-            "\n                if(!DX12Utils::MakeCommandSig(device, argDescs, 1, sizeof(D3D12_DRAW_INDEXED_ARGUMENTS), m_internal.drawCall_" << node.name << "_rootSig, &m_internal.drawCall_" << node.name << "_commandSig, (c_debugNames ? L\"" << node.name << "\" : nullptr), Context::LogFn))"
+            "\n                if(!DX12Utils::MakeCommandSig(device, argDescs, 1, sizeof(D3D12_DRAW_INDEXED_ARGUMENTS), nullptr, &m_internal.drawCall_" << node.name << "_commandSig, (c_debugNames ? L\"" << node.name << "\" : nullptr), Context::LogFn))"
             "\n                return false;"
             "\n            }"
             ;
@@ -490,27 +490,27 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
     // Vertex Shader
     if (node.vertexShader.shader)
     {
-		// Shader compilation info
-		stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
-			"\n"
-			"\n            ShaderCompilationInfo shaderCompilationInfoVS;"
-			"\n            shaderCompilationInfoVS.fileName = std::filesystem::path(Context::s_techniqueLocation) / \"shaders\" / \"" << node.vertexShader.shader->destFileName << "\";"
-			"\n            shaderCompilationInfoVS.entryPoint = \"" << node.vertexShader.shader->entryPoint << "\";"
-			"\n            shaderCompilationInfoVS.shaderModel = \"" << renderGraph.settings.dx12.shaderModelVs << "\";"
-			"\n            shaderCompilationInfoVS.debugName = (c_debugNames ? \"" << (node.name) << "\" : \"\");"
-			"\n            if (c_debugShaders) shaderCompilationInfoVS.flags |= ShaderCompilationFlags::Debug;";
+        // Shader compilation info
+        stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+            "\n"
+            "\n            ShaderCompilationInfo shaderCompilationInfoVS;"
+            "\n            shaderCompilationInfoVS.fileName = std::filesystem::path(Context::s_techniqueLocation) / \"shaders\" / \"" << node.vertexShader.shader->destFileName << "\";"
+            "\n            shaderCompilationInfoVS.entryPoint = \"" << node.vertexShader.shader->entryPoint << "\";"
+            "\n            shaderCompilationInfoVS.shaderModel = \"" << renderGraph.settings.dx12.shaderModelVs << "\";"
+            "\n            shaderCompilationInfoVS.debugName = (c_debugNames ? \"" << (node.name) << "\" : \"\");"
+            "\n            if (c_debugShaders) shaderCompilationInfoVS.flags |= ShaderCompilationFlags::Debug;";
 
-		if (renderGraph.settings.dx12.DXC_HLSL_2021)
-		{
-			stringReplacementMap["/*$(CreateShared)*/"] <<
-				"\n            shaderCompilationInfoVS.flags |= ShaderCompilationFlags::HLSL2021;";
-		}
+        if (renderGraph.settings.dx12.DXC_HLSL_2021)
+        {
+            stringReplacementMap["/*$(CreateShared)*/"] <<
+                "\n            shaderCompilationInfoVS.flags |= ShaderCompilationFlags::HLSL2021;";
+        }
 
-		for (const ShaderDefine& define : node.vertexShader.shader->defines)
-		{
-			stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
-				"\n            shaderCompilationInfoVS.defines.emplace_back(\"" << define.name << "\",\"" << define.value << "\");";
-		}
+        for (const ShaderDefine& define : node.vertexShader.shader->defines)
+        {
+            stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+                "\n            shaderCompilationInfoVS.defines.emplace_back(\"" << define.name << "\",\"" << define.value << "\");";
+        }
 
         stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
             "\n"
@@ -523,26 +523,26 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
     // Pixel Shader
     if (node.pixelShader.shader)
     {
-		stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
-			"\n"
-			"\n            ShaderCompilationInfo shaderCompilationInfoPS;"
-			"\n            shaderCompilationInfoPS.fileName = std::filesystem::path(Context::s_techniqueLocation) / \"shaders\" / \"" << node.pixelShader.shader->destFileName << "\";"
-			"\n            shaderCompilationInfoPS.entryPoint = \"" << node.pixelShader.shader->entryPoint << "\";"
-			"\n            shaderCompilationInfoPS.shaderModel = \"" << renderGraph.settings.dx12.shaderModelPs << "\";"
-			"\n            shaderCompilationInfoPS.debugName = (c_debugNames ? \"" << (node.name) << "\" : \"\");"
-			"\n            if (c_debugShaders) shaderCompilationInfoPS.flags |= ShaderCompilationFlags::Debug;";
+        stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+            "\n"
+            "\n            ShaderCompilationInfo shaderCompilationInfoPS;"
+            "\n            shaderCompilationInfoPS.fileName = std::filesystem::path(Context::s_techniqueLocation) / \"shaders\" / \"" << node.pixelShader.shader->destFileName << "\";"
+            "\n            shaderCompilationInfoPS.entryPoint = \"" << node.pixelShader.shader->entryPoint << "\";"
+            "\n            shaderCompilationInfoPS.shaderModel = \"" << renderGraph.settings.dx12.shaderModelPs << "\";"
+            "\n            shaderCompilationInfoPS.debugName = (c_debugNames ? \"" << (node.name) << "\" : \"\");"
+            "\n            if (c_debugShaders) shaderCompilationInfoPS.flags |= ShaderCompilationFlags::Debug;";
 
-		if (renderGraph.settings.dx12.DXC_HLSL_2021)
-		{
-			stringReplacementMap["/*$(CreateShared)*/"] <<
-				"\n            shaderCompilationInfoPS.flags |= ShaderCompilationFlags::HLSL2021;";
-		}
+        if (renderGraph.settings.dx12.DXC_HLSL_2021)
+        {
+            stringReplacementMap["/*$(CreateShared)*/"] <<
+                "\n            shaderCompilationInfoPS.flags |= ShaderCompilationFlags::HLSL2021;";
+        }
 
-		for (const ShaderDefine& define : node.pixelShader.shader->defines)
-		{
-			stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
-				"\n            shaderCompilationInfoPS.defines.emplace_back(\"" << define.name << "\",\"" << define.value << "\")";
-		}
+        for (const ShaderDefine& define : node.pixelShader.shader->defines)
+        {
+            stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+                "\n            shaderCompilationInfoPS.defines.emplace_back(\"" << define.name << "\",\"" << define.value << "\")";
+        }
 
         stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
             "\n"
@@ -555,26 +555,26 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
     // Amplification Shader
     if (node.amplificationShader.shader)
     {
-		stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
-			"\n"
-			"\n            ShaderCompilationInfo shaderCompilationInfoAS;"
-			"\n            shaderCompilationInfoAS.fileName = std::filesystem::path(Context::s_techniqueLocation) / \"shaders\" / \"" << node.amplificationShader.shader->destFileName << "\";"
-			"\n            shaderCompilationInfoAS.entryPoint = \"" << node.amplificationShader.shader->entryPoint << "\";"
-			"\n            shaderCompilationInfoAS.shaderModel = \"" << renderGraph.settings.dx12.shaderModelAs << "\";"
-			"\n            shaderCompilationInfoAS.debugName = (c_debugNames ? \"" << (node.name) << "\" : \"\");"
-			"\n            if (c_debugShaders) shaderCompilationInfoAS.flags |= ShaderCompilationFlags::Debug;";
+        stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+            "\n"
+            "\n            ShaderCompilationInfo shaderCompilationInfoAS;"
+            "\n            shaderCompilationInfoAS.fileName = std::filesystem::path(Context::s_techniqueLocation) / \"shaders\" / \"" << node.amplificationShader.shader->destFileName << "\";"
+            "\n            shaderCompilationInfoAS.entryPoint = \"" << node.amplificationShader.shader->entryPoint << "\";"
+            "\n            shaderCompilationInfoAS.shaderModel = \"" << renderGraph.settings.dx12.shaderModelAs << "\";"
+            "\n            shaderCompilationInfoAS.debugName = (c_debugNames ? \"" << (node.name) << "\" : \"\");"
+            "\n            if (c_debugShaders) shaderCompilationInfoAS.flags |= ShaderCompilationFlags::Debug;";
 
-		if (renderGraph.settings.dx12.DXC_HLSL_2021)
-		{
-			stringReplacementMap["/*$(CreateShared)*/"] <<
-				"\n            shaderCompilationInfoAS.flags |= ShaderCompilationFlags::HLSL2021;";
-		}
+        if (renderGraph.settings.dx12.DXC_HLSL_2021)
+        {
+            stringReplacementMap["/*$(CreateShared)*/"] <<
+                "\n            shaderCompilationInfoAS.flags |= ShaderCompilationFlags::HLSL2021;";
+        }
 
-		for (const ShaderDefine& define : node.pixelShader.shader->defines)
-		{
-			stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
-				"\n            shaderCompilationInfoAS.defines.emplace_back(\"" << define.name << "\",\"" << define.value << "\")";
-		}
+        for (const ShaderDefine& define : node.pixelShader.shader->defines)
+        {
+            stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+                "\n            shaderCompilationInfoAS.defines.emplace_back(\"" << define.name << "\",\"" << define.value << "\")";
+        }
 
         stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
             "\n"
@@ -587,26 +587,26 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
     // Mesg Shader
     if (node.meshShader.shader)
     {
-		stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
-			"\n"
-			"\n            ShaderCompilationInfo shaderCompilationInfoMS;"
-			"\n            shaderCompilationInfoMS.fileName = std::filesystem::path(Context::s_techniqueLocation) / \"shaders\" / \"" << node.meshShader.shader->destFileName << "\";"
-			"\n            shaderCompilationInfoMS.entryPoint = \"" << node.meshShader.shader->entryPoint << "\";"
-			"\n            shaderCompilationInfoMS.shaderModel = \"" << renderGraph.settings.dx12.shaderModelMs << "\";"
-			"\n            shaderCompilationInfoMS.debugName = (c_debugNames ? \"" << (node.name) << "\" : \"\");"
-			"\n            if (c_debugShaders) shaderCompilationInfoMS.flags |= ShaderCompilationFlags::Debug;";
+        stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+            "\n"
+            "\n            ShaderCompilationInfo shaderCompilationInfoMS;"
+            "\n            shaderCompilationInfoMS.fileName = std::filesystem::path(Context::s_techniqueLocation) / \"shaders\" / \"" << node.meshShader.shader->destFileName << "\";"
+            "\n            shaderCompilationInfoMS.entryPoint = \"" << node.meshShader.shader->entryPoint << "\";"
+            "\n            shaderCompilationInfoMS.shaderModel = \"" << renderGraph.settings.dx12.shaderModelMs << "\";"
+            "\n            shaderCompilationInfoMS.debugName = (c_debugNames ? \"" << (node.name) << "\" : \"\");"
+            "\n            if (c_debugShaders) shaderCompilationInfoMS.flags |= ShaderCompilationFlags::Debug;";
 
-		if (renderGraph.settings.dx12.DXC_HLSL_2021)
-		{
-			stringReplacementMap["/*$(CreateShared)*/"] <<
-				"\n            shaderCompilationInfoMS.flags |= ShaderCompilationFlags::HLSL2021;";
-		}
+        if (renderGraph.settings.dx12.DXC_HLSL_2021)
+        {
+            stringReplacementMap["/*$(CreateShared)*/"] <<
+                "\n            shaderCompilationInfoMS.flags |= ShaderCompilationFlags::HLSL2021;";
+        }
 
-		for (const ShaderDefine& define : node.pixelShader.shader->defines)
-		{
-			stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
-				"\n            shaderCompilationInfoMS.defines.emplace_back(\"" << define.name << "\",\"" << define.value << "\")";
-		}
+        for (const ShaderDefine& define : node.pixelShader.shader->defines)
+        {
+            stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
+                "\n            shaderCompilationInfoMS.defines.emplace_back(\"" << define.name << "\",\"" << define.value << "\")";
+        }
 
         stringReplacementMap["/*$(CreateDrawCallPSOs)*/"] <<
             "\n"
@@ -1103,86 +1103,86 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             std::ostringstream rawAndStrideAndCount;
             switch (dep.type)
             {
-                case ShaderResourceType::ConstantBuffer:
+            case ShaderResourceType::ConstantBuffer:
+            {
+                descriptorsText <<
+                    "\n                { " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "constantBuffer_" << GetNodeName(depNode) << ", " <<
+                    "DXGI_FORMAT_UNKNOWN,"
+                    ;
+                resourceTypeString = "DX12Utils::ResourceType::Buffer";
+
+                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
+                RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
+                size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
+                rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
+                break;
+            }
+            case ShaderResourceType::Buffer:
+            {
+                if (dep.access == ShaderResourceAccessType::RTScene)
                 {
                     descriptorsText <<
                         "\n                { " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "constantBuffer_" << GetNodeName(depNode) << ", " <<
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "tlas, " <<
                         "DXGI_FORMAT_UNKNOWN,"
                         ;
                     resourceTypeString = "DX12Utils::ResourceType::Buffer";
-
-                    GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
-                    RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
-                    size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
-                    rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
-                    break;
+                    rawAndStrideAndCount << ", false, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_tlasSize, 1";
                 }
-                case ShaderResourceType::Buffer:
-                {
-                    if (dep.access == ShaderResourceAccessType::RTScene)
-                    {
-                        descriptorsText <<
-                            "\n                { " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "tlas, " <<
-                            "DXGI_FORMAT_UNKNOWN,"
-                            ;
-                        resourceTypeString = "DX12Utils::ResourceType::Buffer";
-                        rawAndStrideAndCount << ", false, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_tlasSize, 1";
-                    }
-                    else
-                    {
-                        descriptorsText <<
-                            "\n                { " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << ", " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_format,"
-                            ;
-                        resourceTypeString = "DX12Utils::ResourceType::Buffer";
-                        rawAndStrideAndCount << ", " << (shaderResource.buffer.raw ? "true" : "false") << ", context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_stride, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_count";
-                    }
-                    break;
-                }
-                case ShaderResourceType::Texture:
+                else
                 {
                     descriptorsText <<
                         "\n                { " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << ", " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_format,"
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << ", " <<
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_format,"
                         ;
-
-                    rawAndStrideAndCount << ", false, 0, ";
-                    switch (shaderResource.texture.dimension)
-                    {
-                        case TextureDimensionType::Texture2D: resourceTypeString = "DX12Utils::ResourceType::Texture2D"; rawAndStrideAndCount << "0"; break;
-                        case TextureDimensionType::Texture2DArray: resourceTypeString = "DX12Utils::ResourceType::Texture2DArray"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
-                        case TextureDimensionType::Texture3D: resourceTypeString = "DX12Utils::ResourceType::Texture3D"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
-                        case TextureDimensionType::TextureCube: resourceTypeString = "DX12Utils::ResourceType::TextureCube"; rawAndStrideAndCount << "6"; break;
-                        default:
-                        {
-                            GigiAssert(false, "Unhandled TextureDimensionType: %s (%i)", EnumToString(shaderResource.texture.dimension), (int)shaderResource.texture.dimension);
-                            break;
-                        }
-                    }
-                    break;
+                    resourceTypeString = "DX12Utils::ResourceType::Buffer";
+                    rawAndStrideAndCount << ", " << (shaderResource.buffer.raw ? "true" : "false") << ", context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_stride, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_count";
                 }
+                break;
+            }
+            case ShaderResourceType::Texture:
+            {
+                descriptorsText <<
+                    "\n                { " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << ", " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_format,"
+                    ;
+
+                rawAndStrideAndCount << ", false, 0, ";
+                switch (shaderResource.texture.dimension)
+                {
+                case TextureDimensionType::Texture2D: resourceTypeString = "DX12Utils::ResourceType::Texture2D"; rawAndStrideAndCount << "0"; break;
+                case TextureDimensionType::Texture2DArray: resourceTypeString = "DX12Utils::ResourceType::Texture2DArray"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
+                case TextureDimensionType::Texture3D: resourceTypeString = "DX12Utils::ResourceType::Texture3D"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
+                case TextureDimensionType::TextureCube: resourceTypeString = "DX12Utils::ResourceType::TextureCube"; rawAndStrideAndCount << "6"; break;
                 default:
                 {
-                    GigiAssert(false, "Unhandled resource type for draw call node \"%s\"", node.name.c_str());
-                    return;
+                    GigiAssert(false, "Unhandled TextureDimensionType: %s (%i)", EnumToString(shaderResource.texture.dimension), (int)shaderResource.texture.dimension);
+                    break;
                 }
+                }
+                break;
+            }
+            default:
+            {
+                GigiAssert(false, "Unhandled resource type for draw call node \"%s\"", node.name.c_str());
+                return;
+            }
             }
 
             const char* accessType = nullptr;
             switch (dep.access)
             {
-                case ShaderResourceAccessType::UAV: accessType = " DX12Utils::AccessType::UAV, "; break;
-                case ShaderResourceAccessType::RTScene:
-                case ShaderResourceAccessType::SRV: accessType = " DX12Utils::AccessType::SRV, "; break;
-                case ShaderResourceAccessType::CBV: accessType = " DX12Utils::AccessType::CBV, "; break;
-                default:
-                {
-                    GigiAssert(false, "Unhandled resource type: %i", dep.access);
-                }
+            case ShaderResourceAccessType::UAV: accessType = " DX12Utils::AccessType::UAV, "; break;
+            case ShaderResourceAccessType::RTScene:
+            case ShaderResourceAccessType::SRV: accessType = " DX12Utils::AccessType::SRV, "; break;
+            case ShaderResourceAccessType::CBV: accessType = " DX12Utils::AccessType::CBV, "; break;
+            default:
+            {
+                GigiAssert(false, "Unhandled resource type: %i", dep.access);
+            }
             }
 
             if (UAVMipIndexVarIndex != -1)
@@ -1270,86 +1270,86 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             std::ostringstream rawAndStrideAndCount;
             switch (dep.type)
             {
-                case ShaderResourceType::ConstantBuffer:
+            case ShaderResourceType::ConstantBuffer:
+            {
+                descriptorsText <<
+                    "\n                { " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "constantBuffer_" << GetNodeName(depNode) << ", " <<
+                    "DXGI_FORMAT_UNKNOWN,"
+                    ;
+                resourceTypeString = "DX12Utils::ResourceType::Buffer";
+
+                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
+                RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
+                size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
+                rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
+                break;
+            }
+            case ShaderResourceType::Buffer:
+            {
+                if (dep.access == ShaderResourceAccessType::RTScene)
                 {
                     descriptorsText <<
                         "\n                { " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "constantBuffer_" << GetNodeName(depNode) << ", " <<
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "tlas, " <<
                         "DXGI_FORMAT_UNKNOWN,"
                         ;
                     resourceTypeString = "DX12Utils::ResourceType::Buffer";
-
-                    GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
-                    RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
-                    size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
-                    rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
-                    break;
+                    rawAndStrideAndCount << ", false, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_tlasSize, 1";
                 }
-                case ShaderResourceType::Buffer:
-                {
-                    if (dep.access == ShaderResourceAccessType::RTScene)
-                    {
-                        descriptorsText <<
-                            "\n                { " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "tlas, " <<
-                            "DXGI_FORMAT_UNKNOWN,"
-                            ;
-                        resourceTypeString = "DX12Utils::ResourceType::Buffer";
-                        rawAndStrideAndCount << ", false, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_tlasSize, 1";
-                    }
-                    else
-                    {
-                        descriptorsText <<
-                            "\n                { " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << ", " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_format,"
-                            ;
-                        resourceTypeString = "DX12Utils::ResourceType::Buffer";
-                        rawAndStrideAndCount << ", " << (shaderResource.buffer.raw ? "true" : "false") << ", context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_stride, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_count";
-                    }
-                    break;
-                }
-                case ShaderResourceType::Texture:
+                else
                 {
                     descriptorsText <<
                         "\n                { " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << ", " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_format,"
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << ", " <<
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_format,"
                         ;
-
-                    rawAndStrideAndCount << ", false, 0, ";
-                    switch (shaderResource.texture.dimension)
-                    {
-                        case TextureDimensionType::Texture2D: resourceTypeString = "DX12Utils::ResourceType::Texture2D"; rawAndStrideAndCount << "0"; break;
-                        case TextureDimensionType::Texture2DArray: resourceTypeString = "DX12Utils::ResourceType::Texture2DArray"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
-                        case TextureDimensionType::Texture3D: resourceTypeString = "DX12Utils::ResourceType::Texture3D"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
-                        case TextureDimensionType::TextureCube: resourceTypeString = "DX12Utils::ResourceType::TextureCube"; rawAndStrideAndCount << "6"; break;
-                        default:
-                        {
-                            GigiAssert(false, "Unhandled TextureDimensionType: %s (%i)", EnumToString(shaderResource.texture.dimension), (int)shaderResource.texture.dimension);
-                            break;
-                        }
-                    }
-                    break;
+                    resourceTypeString = "DX12Utils::ResourceType::Buffer";
+                    rawAndStrideAndCount << ", " << (shaderResource.buffer.raw ? "true" : "false") << ", context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_stride, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_count";
                 }
+                break;
+            }
+            case ShaderResourceType::Texture:
+            {
+                descriptorsText <<
+                    "\n                { " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << ", " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_format,"
+                    ;
+
+                rawAndStrideAndCount << ", false, 0, ";
+                switch (shaderResource.texture.dimension)
+                {
+                case TextureDimensionType::Texture2D: resourceTypeString = "DX12Utils::ResourceType::Texture2D"; rawAndStrideAndCount << "0"; break;
+                case TextureDimensionType::Texture2DArray: resourceTypeString = "DX12Utils::ResourceType::Texture2DArray"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
+                case TextureDimensionType::Texture3D: resourceTypeString = "DX12Utils::ResourceType::Texture3D"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
+                case TextureDimensionType::TextureCube: resourceTypeString = "DX12Utils::ResourceType::TextureCube"; rawAndStrideAndCount << "6"; break;
                 default:
                 {
-                    GigiAssert(false, "Unhandled resource type for draw call node \"%s\"", node.name.c_str());
-                    return;
+                    GigiAssert(false, "Unhandled TextureDimensionType: %s (%i)", EnumToString(shaderResource.texture.dimension), (int)shaderResource.texture.dimension);
+                    break;
                 }
+                }
+                break;
+            }
+            default:
+            {
+                GigiAssert(false, "Unhandled resource type for draw call node \"%s\"", node.name.c_str());
+                return;
+            }
             }
 
             const char* accessType = nullptr;
             switch (dep.access)
             {
-                case ShaderResourceAccessType::UAV: accessType = " DX12Utils::AccessType::UAV, "; break;
-                case ShaderResourceAccessType::RTScene:
-                case ShaderResourceAccessType::SRV: accessType = " DX12Utils::AccessType::SRV, "; break;
-                case ShaderResourceAccessType::CBV: accessType = " DX12Utils::AccessType::CBV, "; break;
-                default:
-                {
-                    GigiAssert(false, "Unhandled resource type: %i", dep.access);
-                }
+            case ShaderResourceAccessType::UAV: accessType = " DX12Utils::AccessType::UAV, "; break;
+            case ShaderResourceAccessType::RTScene:
+            case ShaderResourceAccessType::SRV: accessType = " DX12Utils::AccessType::SRV, "; break;
+            case ShaderResourceAccessType::CBV: accessType = " DX12Utils::AccessType::CBV, "; break;
+            default:
+            {
+                GigiAssert(false, "Unhandled resource type: %i", dep.access);
+            }
             }
 
             if (UAVMipIndexVarIndex != -1)
@@ -1440,86 +1440,86 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             std::ostringstream rawAndStrideAndCount;
             switch (dep.type)
             {
-                case ShaderResourceType::ConstantBuffer:
+            case ShaderResourceType::ConstantBuffer:
+            {
+                descriptorsText <<
+                    "\n                { " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "constantBuffer_" << GetNodeName(depNode) << ", " <<
+                    "DXGI_FORMAT_UNKNOWN,"
+                    ;
+                resourceTypeString = "DX12Utils::ResourceType::Buffer";
+
+                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
+                RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
+                size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
+                rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
+                break;
+            }
+            case ShaderResourceType::Buffer:
+            {
+                if (dep.access == ShaderResourceAccessType::RTScene)
                 {
                     descriptorsText <<
                         "\n                { " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "constantBuffer_" << GetNodeName(depNode) << ", " <<
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "tlas, " <<
                         "DXGI_FORMAT_UNKNOWN,"
                         ;
                     resourceTypeString = "DX12Utils::ResourceType::Buffer";
-
-                    GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
-                    RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
-                    size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
-                    rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
-                    break;
+                    rawAndStrideAndCount << ", false, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_tlasSize, 1";
                 }
-                case ShaderResourceType::Buffer:
-                {
-                    if (dep.access == ShaderResourceAccessType::RTScene)
-                    {
-                        descriptorsText <<
-                            "\n                { " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "tlas, " <<
-                            "DXGI_FORMAT_UNKNOWN,"
-                            ;
-                        resourceTypeString = "DX12Utils::ResourceType::Buffer";
-                        rawAndStrideAndCount << ", false, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_tlasSize, 1";
-                    }
-                    else
-                    {
-                        descriptorsText <<
-                            "\n                { " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << ", " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_format,"
-                            ;
-                        resourceTypeString = "DX12Utils::ResourceType::Buffer";
-                        rawAndStrideAndCount << ", " << (shaderResource.buffer.raw ? "true" : "false") << ", context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_stride, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_count";
-                    }
-                    break;
-                }
-                case ShaderResourceType::Texture:
+                else
                 {
                     descriptorsText <<
                         "\n                { " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << ", " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_format,"
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << ", " <<
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_format,"
                         ;
-
-                    rawAndStrideAndCount << ", false, 0, ";
-                    switch (shaderResource.texture.dimension)
-                    {
-                        case TextureDimensionType::Texture2D: resourceTypeString = "DX12Utils::ResourceType::Texture2D"; rawAndStrideAndCount << "0"; break;
-                        case TextureDimensionType::Texture2DArray: resourceTypeString = "DX12Utils::ResourceType::Texture2DArray"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
-                        case TextureDimensionType::Texture3D: resourceTypeString = "DX12Utils::ResourceType::Texture3D"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
-                        case TextureDimensionType::TextureCube: resourceTypeString = "DX12Utils::ResourceType::TextureCube"; rawAndStrideAndCount << "6"; break;
-                        default:
-                        {
-                            GigiAssert(false, "Unhandled TextureDimensionType: %s (%i)", EnumToString(shaderResource.texture.dimension), (int)shaderResource.texture.dimension);
-                            break;
-                        }
-                    }
-                    break;
+                    resourceTypeString = "DX12Utils::ResourceType::Buffer";
+                    rawAndStrideAndCount << ", " << (shaderResource.buffer.raw ? "true" : "false") << ", context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_stride, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_count";
                 }
+                break;
+            }
+            case ShaderResourceType::Texture:
+            {
+                descriptorsText <<
+                    "\n                { " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << ", " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_format,"
+                    ;
+
+                rawAndStrideAndCount << ", false, 0, ";
+                switch (shaderResource.texture.dimension)
+                {
+                case TextureDimensionType::Texture2D: resourceTypeString = "DX12Utils::ResourceType::Texture2D"; rawAndStrideAndCount << "0"; break;
+                case TextureDimensionType::Texture2DArray: resourceTypeString = "DX12Utils::ResourceType::Texture2DArray"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
+                case TextureDimensionType::Texture3D: resourceTypeString = "DX12Utils::ResourceType::Texture3D"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
+                case TextureDimensionType::TextureCube: resourceTypeString = "DX12Utils::ResourceType::TextureCube"; rawAndStrideAndCount << "6"; break;
                 default:
                 {
-                    GigiAssert(false, "Unhandled resource type for draw call node \"%s\"", node.name.c_str());
-                    return;
+                    GigiAssert(false, "Unhandled TextureDimensionType: %s (%i)", EnumToString(shaderResource.texture.dimension), (int)shaderResource.texture.dimension);
+                    break;
                 }
+                }
+                break;
+            }
+            default:
+            {
+                GigiAssert(false, "Unhandled resource type for draw call node \"%s\"", node.name.c_str());
+                return;
+            }
             }
 
             const char* accessType = nullptr;
             switch (dep.access)
             {
-                case ShaderResourceAccessType::UAV: accessType = " DX12Utils::AccessType::UAV, "; break;
-                case ShaderResourceAccessType::RTScene:
-                case ShaderResourceAccessType::SRV: accessType = " DX12Utils::AccessType::SRV, "; break;
-                case ShaderResourceAccessType::CBV: accessType = " DX12Utils::AccessType::CBV, "; break;
-                default:
-                {
-                    GigiAssert(false, "Unhandled resource type: %i", dep.access);
-                }
+            case ShaderResourceAccessType::UAV: accessType = " DX12Utils::AccessType::UAV, "; break;
+            case ShaderResourceAccessType::RTScene:
+            case ShaderResourceAccessType::SRV: accessType = " DX12Utils::AccessType::SRV, "; break;
+            case ShaderResourceAccessType::CBV: accessType = " DX12Utils::AccessType::CBV, "; break;
+            default:
+            {
+                GigiAssert(false, "Unhandled resource type: %i", dep.access);
+            }
             }
 
             if (UAVMipIndexVarIndex != -1)
@@ -1611,86 +1611,86 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             std::ostringstream rawAndStrideAndCount;
             switch (dep.type)
             {
-                case ShaderResourceType::ConstantBuffer:
+            case ShaderResourceType::ConstantBuffer:
+            {
+                descriptorsText <<
+                    "\n                { " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "constantBuffer_" << GetNodeName(depNode) << ", " <<
+                    "DXGI_FORMAT_UNKNOWN,"
+                    ;
+                resourceTypeString = "DX12Utils::ResourceType::Buffer";
+
+                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
+                RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
+                size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
+                rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
+                break;
+            }
+            case ShaderResourceType::Buffer:
+            {
+                if (dep.access == ShaderResourceAccessType::RTScene)
                 {
                     descriptorsText <<
                         "\n                { " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "constantBuffer_" << GetNodeName(depNode) << ", " <<
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "tlas, " <<
                         "DXGI_FORMAT_UNKNOWN,"
                         ;
                     resourceTypeString = "DX12Utils::ResourceType::Buffer";
-
-                    GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
-                    RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
-                    size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
-                    rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
-                    break;
+                    rawAndStrideAndCount << ", false, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_tlasSize, 1";
                 }
-                case ShaderResourceType::Buffer:
-                {
-                    if (dep.access == ShaderResourceAccessType::RTScene)
-                    {
-                        descriptorsText <<
-                            "\n                { " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "tlas, " <<
-                            "DXGI_FORMAT_UNKNOWN,"
-                            ;
-                        resourceTypeString = "DX12Utils::ResourceType::Buffer";
-                        rawAndStrideAndCount << ", false, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_tlasSize, 1";
-                    }
-                    else
-                    {
-                        descriptorsText <<
-                            "\n                { " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << ", " <<
-                            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_format,"
-                            ;
-                        resourceTypeString = "DX12Utils::ResourceType::Buffer";
-                        rawAndStrideAndCount << ", " << (shaderResource.buffer.raw ? "true" : "false") << ", context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_stride, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_count";
-                    }
-                    break;
-                }
-                case ShaderResourceType::Texture:
+                else
                 {
                     descriptorsText <<
                         "\n                { " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << ", " <<
-                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_format,"
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << ", " <<
+                        "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_format,"
                         ;
-
-                    rawAndStrideAndCount << ", false, 0, ";
-                    switch (shaderResource.texture.dimension)
-                    {
-                        case TextureDimensionType::Texture2D: resourceTypeString = "DX12Utils::ResourceType::Texture2D"; rawAndStrideAndCount << "0"; break;
-                        case TextureDimensionType::Texture2DArray: resourceTypeString = "DX12Utils::ResourceType::Texture2DArray"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
-                        case TextureDimensionType::Texture3D: resourceTypeString = "DX12Utils::ResourceType::Texture3D"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
-                        case TextureDimensionType::TextureCube: resourceTypeString = "DX12Utils::ResourceType::TextureCube"; rawAndStrideAndCount << "6"; break;
-                        default:
-                        {
-                            GigiAssert(false, "Unhandled TextureDimensionType: %s (%i)", EnumToString(shaderResource.texture.dimension), (int)shaderResource.texture.dimension);
-                            break;
-                        }
-                    }
-                    break;
+                    resourceTypeString = "DX12Utils::ResourceType::Buffer";
+                    rawAndStrideAndCount << ", " << (shaderResource.buffer.raw ? "true" : "false") << ", context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_stride, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "buffer_" << GetNodeName(depNode) << "_count";
                 }
+                break;
+            }
+            case ShaderResourceType::Texture:
+            {
+                descriptorsText <<
+                    "\n                { " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << ", " <<
+                    "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_format,"
+                    ;
+
+                rawAndStrideAndCount << ", false, 0, ";
+                switch (shaderResource.texture.dimension)
+                {
+                case TextureDimensionType::Texture2D: resourceTypeString = "DX12Utils::ResourceType::Texture2D"; rawAndStrideAndCount << "0"; break;
+                case TextureDimensionType::Texture2DArray: resourceTypeString = "DX12Utils::ResourceType::Texture2DArray"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
+                case TextureDimensionType::Texture3D: resourceTypeString = "DX12Utils::ResourceType::Texture3D"; rawAndStrideAndCount << "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(depNode)) << "texture_" << GetNodeName(depNode) << "_size[2]"; break;
+                case TextureDimensionType::TextureCube: resourceTypeString = "DX12Utils::ResourceType::TextureCube"; rawAndStrideAndCount << "6"; break;
                 default:
                 {
-                    GigiAssert(false, "Unhandled resource type for draw call node \"%s\"", node.name.c_str());
-                    return;
+                    GigiAssert(false, "Unhandled TextureDimensionType: %s (%i)", EnumToString(shaderResource.texture.dimension), (int)shaderResource.texture.dimension);
+                    break;
                 }
+                }
+                break;
+            }
+            default:
+            {
+                GigiAssert(false, "Unhandled resource type for draw call node \"%s\"", node.name.c_str());
+                return;
+            }
             }
 
             const char* accessType = nullptr;
             switch (dep.access)
             {
-                case ShaderResourceAccessType::UAV: accessType = " DX12Utils::AccessType::UAV, "; break;
-                case ShaderResourceAccessType::RTScene:
-                case ShaderResourceAccessType::SRV: accessType = " DX12Utils::AccessType::SRV, "; break;
-                case ShaderResourceAccessType::CBV: accessType = " DX12Utils::AccessType::CBV, "; break;
-                default:
-                {
-                    GigiAssert(false, "Unhandled resource type: %i", dep.access);
-                }
+            case ShaderResourceAccessType::UAV: accessType = " DX12Utils::AccessType::UAV, "; break;
+            case ShaderResourceAccessType::RTScene:
+            case ShaderResourceAccessType::SRV: accessType = " DX12Utils::AccessType::SRV, "; break;
+            case ShaderResourceAccessType::CBV: accessType = " DX12Utils::AccessType::CBV, "; break;
+            default:
+            {
+                GigiAssert(false, "Unhandled resource type: %i", dep.access);
+            }
             }
 
             if (UAVMipIndexVarIndex != -1)
@@ -1899,8 +1899,8 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             "\n            {"
             "\n                 float clearValues[4] = { " << std::fixed << ctSettings.clearColor[0] << "f, " << ctSettings.clearColor[1] << "f, " << ctSettings.clearColor[2] << "f, " << ctSettings.clearColor[3] << "f };"
             "\n                 int rtvIndex = context->GetRTV(device, context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(colorTargetNodeBase)) << "texture_" << colorTargetNode.name << ", "
-                                "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(colorTargetNodeBase)) << "texture_" << colorTargetNode.name << "_format, " << TextureDimensionTypeToD3D12_RTV_DIMENSION(colorTargetNode.dimension) <<
-                                ", " << ctSettings.arrayIndex << ", " << ctSettings.mipLevel << ", \"" << renderGraph.name << "." << colorTargetNode.name << "\");"
+            "context->" << GetResourceNodePathInContext(GetNodeResourceVisibility(colorTargetNodeBase)) << "texture_" << colorTargetNode.name << "_format, " << TextureDimensionTypeToD3D12_RTV_DIMENSION(colorTargetNode.dimension) <<
+            ", " << ctSettings.arrayIndex << ", " << ctSettings.mipLevel << ", \"" << renderGraph.name << "." << colorTargetNode.name << "\");"
             "\n                 if (rtvIndex == -1)"
             "\n                     Context::LogFn(LogLevel::Error, \"Could not get RTV for " << renderGraph.name << "." << colorTargetNode.name << "\");"
             "\n                 commandList->ClearRenderTargetView(s_heapAllocationTrackerRTV.GetCPUHandle(rtvIndex), clearValues, 0, nullptr);"
@@ -1923,7 +1923,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                     "\n            // Clear " << depthTargetNode.name <<
                     "\n            {"
                     "\n                 D3D12_CLEAR_FLAGS clearFlags = ";
-                    ;
+                ;
 
                 if (node.depthTargetClear && node.stencilClear)
                     stringReplacementMap["/*$(Execute)*/"] << "D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL;";
@@ -2132,31 +2132,31 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             Variable& var = renderGraph.variables[node.meshShaderDispatchSize.variable.variableIndex];
             switch (DataFieldTypeComponentCount(var.type))
             {
-                case 1:
-                {
-                    stringReplacementMap["/*$(Execute)*/"] <<
-                        "\n"
-                        "\n            unsigned int baseDispatchSize[3] = { (unsigned int)" << VariableToString(var, renderGraph) << ", 1, 1 };";
-                    break;
-                }
-                case 2:
-                {
-                    stringReplacementMap["/*$(Execute)*/"] <<
-                        "\n"
-                        "\n            unsigned int baseDispatchSize[3] = { (unsigned int)" << VariableToString(var, renderGraph) << "[0], (unsigned int)" << VariableToString(var, renderGraph) << "[1], 1 };";
-                    break;
-                }
-                case 3:
-                {
-                    stringReplacementMap["/*$(Execute)*/"] <<
-                        "\n"
-                        "\n            unsigned int baseDispatchSize[3] = { (unsigned int)" << VariableToString(var, renderGraph) << "[0], (unsigned int)" << VariableToString(var, renderGraph) << "[1], (unsigned int)" << VariableToString(var, renderGraph) << "[2] };";
-                    break;
-                }
-                default:
-                {
-                    GigiAssert(false, "Inappropriate variable type given for dispatch size.");
-                }
+            case 1:
+            {
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n            unsigned int baseDispatchSize[3] = { (unsigned int)" << VariableToString(var, renderGraph) << ", 1, 1 };";
+                break;
+            }
+            case 2:
+            {
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n            unsigned int baseDispatchSize[3] = { (unsigned int)" << VariableToString(var, renderGraph) << "[0], (unsigned int)" << VariableToString(var, renderGraph) << "[1], 1 };";
+                break;
+            }
+            case 3:
+            {
+                stringReplacementMap["/*$(Execute)*/"] <<
+                    "\n"
+                    "\n            unsigned int baseDispatchSize[3] = { (unsigned int)" << VariableToString(var, renderGraph) << "[0], (unsigned int)" << VariableToString(var, renderGraph) << "[1], (unsigned int)" << VariableToString(var, renderGraph) << "[2] };";
+                break;
+            }
+            default:
+            {
+                GigiAssert(false, "Inappropriate variable type given for dispatch size.");
+            }
             }
         }
         else
@@ -2193,7 +2193,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             "\n            }"
             ;
     }
-    else if(node.enableIndirect)
+    else if (node.enableIndirect)
     {
         // Indirect exection
         int indirectBufferResourceNodeIndex = node.enableIndirect ? node.indirectExecution.indirectBuffer.nodeIndex : -1;
@@ -2209,7 +2209,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             if (node.indirectExecution.indirectOffset.variable.variableIndex != -1)
             {
                 const Variable& variable = renderGraph.variables[node.indirectExecution.indirectOffset.variable.variableIndex];
-                if (variable.type == DataFieldType::Int)
+                if (variable.type == DataFieldType::Uint)
                 {
                     stringReplacementMap["/*$(Execute)*/"] <<
                         "\n"
@@ -2232,7 +2232,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             if (node.indirectExecution.indirectMaxCount.variable.variableIndex != -1)
             {
                 const Variable& variable = renderGraph.variables[node.indirectExecution.indirectMaxCount.variable.variableIndex];
-                if (variable.type == DataFieldType::Int)
+                if (variable.type == DataFieldType::Uint)
                 {
                     stringReplacementMap["/*$(Execute)*/"] <<
                         "\n"
@@ -2262,7 +2262,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
             if (node.indirectExecution.indirectCountOffset.variable.variableIndex != -1)
             {
                 const Variable& variable = renderGraph.variables[node.indirectExecution.indirectCountOffset.variable.variableIndex];
-                if (variable.type == DataFieldType::Int)
+                if (variable.type == DataFieldType::Uint)
                 {
                     stringReplacementMap["/*$(Execute)*/"] <<
                         "\n"
