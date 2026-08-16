@@ -119,6 +119,7 @@ inline bool SamplerFilterToD3D12Filter(SamplerFilter filter, D3D12_FILTER& d3d12
 		case SamplerFilter::MinMagMipPoint: d3d12Filter = D3D12_FILTER_MIN_MAG_MIP_POINT; return true;
 		case SamplerFilter::MinMagLinear_MipPoint: d3d12Filter = D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT; return true;
 		case SamplerFilter::MinMagMipLinear: d3d12Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR; return true;
+        case SamplerFilter::Anisotropic: d3d12Filter = D3D12_FILTER_ANISOTROPIC; return true;
 		default: return false;
 	}
 	return false;
@@ -134,6 +135,31 @@ inline bool SamplerAddressModeToD3D12AddressMode(SamplerAddressMode mode, D3D12_
 		default: return false;
 	}
 	return false;
+}
+
+inline bool SamplerMaxAnisotropyToUint(SamplerMaxAnisotropy maxAnisotropy, UINT& value)
+{
+    switch (maxAnisotropy)
+    {
+    case SamplerMaxAnisotropy::x1: value = 1; return true;
+    case SamplerMaxAnisotropy::x2: value = 2; return true;
+    case SamplerMaxAnisotropy::x3: value = 3; return true;
+    case SamplerMaxAnisotropy::x4: value = 4; return true;
+    case SamplerMaxAnisotropy::x5: value = 5; return true;
+    case SamplerMaxAnisotropy::x6: value = 6; return true;
+    case SamplerMaxAnisotropy::x7: value = 7; return true;
+    case SamplerMaxAnisotropy::x8: value = 8; return true;
+    case SamplerMaxAnisotropy::x9: value = 9; return true;
+    case SamplerMaxAnisotropy::x10: value = 10; return true;
+    case SamplerMaxAnisotropy::x11: value = 11; return true;
+    case SamplerMaxAnisotropy::x12: value = 12; return true;
+    case SamplerMaxAnisotropy::x13: value = 13; return true;
+    case SamplerMaxAnisotropy::x14: value = 14; return true;
+    case SamplerMaxAnisotropy::x15: value = 15; return true;
+    case SamplerMaxAnisotropy::x16: value = 16; return true;
+    default: return false;
+    }
+    return false;
 }
 
 inline DXGI_FORMAT TextureFormatToDXGI_FORMAT(TextureFormat textureFormat)

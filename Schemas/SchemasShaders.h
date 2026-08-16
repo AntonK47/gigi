@@ -69,14 +69,15 @@ ENUM_BEGIN(TextureViewType, "The type that a texture is actually viewed as, in a
 ENUM_END()
 
 ENUM_BEGIN(SamplerFilter, "The type of filter a sampler uses")
-	ENUM_ITEM(MinMagMipPoint, "") // 000
-	ENUM_ITEM(MinMagPoint_MipLinear, "") // 001
-	ENUM_ITEM(MinPoint_MagLinear_MipPoint, "") // 010
-	ENUM_ITEM(MinPoint_MagMipLinear, "") // 011
-	ENUM_ITEM(MinLinear_MagMipPoint, "") // 100
-	ENUM_ITEM(MinLinear_MagPoint_MipLinear, "") // 101
-	ENUM_ITEM(MinMagLinear_MipPoint, "") // 110
-	ENUM_ITEM(MinMagMipLinear, "") // 111
+	ENUM_ITEM(MinMagMipPoint, "") // 0000
+	ENUM_ITEM(MinMagPoint_MipLinear, "") // 0001
+	ENUM_ITEM(MinPoint_MagLinear_MipPoint, "") // 0010
+	ENUM_ITEM(MinPoint_MagMipLinear, "") // 0011
+	ENUM_ITEM(MinLinear_MagMipPoint, "") // 0100
+	ENUM_ITEM(MinLinear_MagPoint_MipLinear, "") // 0101
+	ENUM_ITEM(MinMagLinear_MipPoint, "") // 0110
+	ENUM_ITEM(MinMagMipLinear, "") // 0111
+    ENUM_ITEM(Anisotropic, "") // 1000
 
 	ENUM_ITEM(Count, "")
 ENUM_END()
@@ -84,6 +85,26 @@ ENUM_END()
 ENUM_BEGIN(SamplerFilterComponent, "A component of sampler filtering")
 	ENUM_ITEM(Point, "Point")
 	ENUM_ITEM(Linear, "Linear")
+ENUM_END()
+
+ENUM_BEGIN(SamplerMaxAnisotropy, "The max anisotropy value")
+    ENUM_ITEM(x1, "x1")
+    ENUM_ITEM(x2, "x2")
+    ENUM_ITEM(x3, "x3")
+    ENUM_ITEM(x4, "x4")
+    ENUM_ITEM(x5, "x5")
+    ENUM_ITEM(x6, "x6")
+    ENUM_ITEM(x7, "x7")
+    ENUM_ITEM(x8, "x8")
+    ENUM_ITEM(x9, "x9")
+    ENUM_ITEM(x10, "x10")
+    ENUM_ITEM(x11, "x11")
+    ENUM_ITEM(x12, "x12")
+    ENUM_ITEM(x13, "x13")
+    ENUM_ITEM(x14, "x14")
+    ENUM_ITEM(x15, "x15")
+    ENUM_ITEM(x16, "x16")
+    ENUM_ITEM(Count, "")
 ENUM_END()
 
 ENUM_BEGIN(SamplerAddressMode, "The sampler address mode")
@@ -167,7 +188,7 @@ STRUCT_BEGIN(CooperativeVectorData, "Data needed for cooperative vectors support
 STRUCT_END()
 
 STRUCT_BEGIN(LoadPLYSettings, "Settings for loading ply files")
-	STRUCT_FIELD(bool, flatten, false, "If true, when there is an element named face, with a single list property, then the element named vertex will be duplicated to flatten the vertixes into a deindexed list.", 0)
+	STRUCT_FIELD(bool, flatten, false, "If true, when there is an element named face, with a single list property, then the element named vertex will be duplicated to flatten the vertices into a deindexed list.", 0)
 	STRUCT_FIELD(std::string, element, "", "The name of the element to load. If none specified and there is only one element, that element will be loaded.", 0)
 STRUCT_END()
 
@@ -304,7 +325,7 @@ STRUCT_BEGIN(StructField, "A field in a struct")
 	STRUCT_FIELD(std::string, Enum, "", "Integer types can specify an enum, which will then make symbols in both C++ and shader code.", 0)
 	STRUCT_FIELD(StructFieldSemantic, semantic, StructFieldSemantic::Count, "Used to specify if the struct field has special meaning, such as a vertex position in a vertex buffer. If none is given, it shows up in shaders as an autonumbering text coordinate.", 0)
 	STRUCT_FIELD(int, semanticIndex, 0, "Some semantics can have multiple channels, like UVs and colors", 0)
-	STRUCT_FIELD(bool, allowAtomicOps, false, "Nedeed by WebGPU. Check this box to allow atopic operations on this field.", 0)
+	STRUCT_FIELD(bool, allowAtomicOps, false, "Needed by WebGPU. Check this box to allow atopic operations on this field.", 0)
 
 	STRUCT_FIELD(bool, isPadding, false, "true if this field was added to pad the struct for alignment reasons.", SCHEMA_FLAG_NO_SERIALIZE)
 	STRUCT_FIELD(int, enumIndex, -1, "Calculated for convenience.", SCHEMA_FLAG_NO_SERIALIZE)
@@ -348,6 +369,7 @@ STRUCT_BEGIN(ShaderSampler, "Data specific to samplers")
 	STRUCT_FIELD(std::string, name, "", "The name of the resource in the shader", 0)
 	STRUCT_FIELD(SamplerFilter, filter, SamplerFilter::MinMagMipLinear, "The type of filtering to do", 0)
 	STRUCT_FIELD(SamplerAddressMode, addressMode, SamplerAddressMode::Wrap, "The sampling address mode", 0)
+    STRUCT_FIELD(SamplerMaxAnisotropy, maxAnisotropy, SamplerMaxAnisotropy::x1, "The max anisotropy value, used when anisotropic filter mode is enabled", 0)
 
 	STRUCT_FIELD(int, registerIndex, -1, "For root signatures and shader code that wants registers declared. Calculated before backend code is called, for convenience of backends.", SCHEMA_FLAG_NO_SERIALIZE)
 	STRUCT_FIELD(std::string, registerSpaceString, "", "Displayed after the register in the shader", SCHEMA_FLAG_NO_SERIALIZE)
@@ -360,7 +382,7 @@ STRUCT_BEGIN(ShaderResource, "A declaration of a resource that a shader wants")
 	STRUCT_FIELD(ShaderResourceBuffer, buffer, {}, "Data specific to buffers", 0)
 	STRUCT_FIELD(ShaderResourceTexture, texture, {}, "Data specific to textures", 0)
 	STRUCT_FIELD(BackendRestriction, backends, {}, "The backends this resource is present for.", SCHEMA_FLAG_UI_COLLAPSABLE)
-	STRUCT_FIELD(bool, allowAtomicOps, false, "Nedeed by WebGPU. Check this box to allow atopic operations on this field.", 0)
+	STRUCT_FIELD(bool, allowAtomicOps, false, "Needed by WebGPU. Check this box to allow atopic operations on this field.", 0)
 
 	STRUCT_FIELD(int, registerIndex, -1, "For root signatures and shader code that wants registers declared. Calculated before backend code is called, for convenience of backends.", SCHEMA_FLAG_NO_SERIALIZE)
 	STRUCT_FIELD(std::string, registerSpaceString, "", "Displayed after the register in the shader", SCHEMA_FLAG_NO_SERIALIZE)
@@ -407,7 +429,7 @@ STRUCT_BEGIN(RTHitGroup, "A declaration of a ray tracing hit group, which may co
 	STRUCT_FIELD(RTIntersectionShaderReferenceOptional, intersection, {}, "The intersection shader", 0)
 
 	STRUCT_FIELD(std::string, originalName, "", "The name before renames and sanitization", SCHEMA_FLAG_NO_SERIALIZE)
-	STRUCT_FIELD(std::string, scope, "", "The scope that the node lives in. A possibly nested list of subgraph node names, seperated by a dot.", SCHEMA_FLAG_NO_SERIALIZE)
+	STRUCT_FIELD(std::string, scope, "", "The scope that the node lives in. A possibly nested list of subgraph node names, separated by a dot.", SCHEMA_FLAG_NO_SERIALIZE)
 STRUCT_END()
 
 //========================================================

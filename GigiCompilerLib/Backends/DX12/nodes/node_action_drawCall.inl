@@ -109,7 +109,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                     "\n            samplers[" << samplerIndex << "].AddressV = " << SamplerAddressModeToD3D12_TEXTURE_ADDRESS_MODE(sampler.addressMode) << ";"
                     "\n            samplers[" << samplerIndex << "].AddressW = " << SamplerAddressModeToD3D12_TEXTURE_ADDRESS_MODE(sampler.addressMode) << ";"
                     "\n            samplers[" << samplerIndex << "].MipLODBias  = 0;"
-                    "\n            samplers[" << samplerIndex << "].MaxAnisotropy  = 0;"
+                    "\n            samplers[" << samplerIndex << "].MaxAnisotropy = " << SamplerMaxAnisotropyToUint(sampler.maxAnisotropy) << ";"
                     "\n            samplers[" << samplerIndex << "].ComparisonFunc  = D3D12_COMPARISON_FUNC_NEVER;"
                     "\n            samplers[" << samplerIndex << "].BorderColor  = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;"
                     "\n            samplers[" << samplerIndex << "].MinLOD = 0.0f;"
@@ -135,7 +135,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                     "\n            samplers[" << samplerIndex << "].AddressV = " << SamplerAddressModeToD3D12_TEXTURE_ADDRESS_MODE(sampler.addressMode) << ";"
                     "\n            samplers[" << samplerIndex << "].AddressW = " << SamplerAddressModeToD3D12_TEXTURE_ADDRESS_MODE(sampler.addressMode) << ";"
                     "\n            samplers[" << samplerIndex << "].MipLODBias  = 0;"
-                    "\n            samplers[" << samplerIndex << "].MaxAnisotropy  = 0;"
+                    "\n            samplers[" << samplerIndex << "].MaxAnisotropy = " << SamplerMaxAnisotropyToUint(sampler.maxAnisotropy) << ";"
                     "\n            samplers[" << samplerIndex << "].ComparisonFunc  = D3D12_COMPARISON_FUNC_NEVER;"
                     "\n            samplers[" << samplerIndex << "].BorderColor  = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;"
                     "\n            samplers[" << samplerIndex << "].MinLOD = 0.0f;"
@@ -161,7 +161,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                     "\n            samplers[" << samplerIndex << "].AddressV = " << SamplerAddressModeToD3D12_TEXTURE_ADDRESS_MODE(sampler.addressMode) << ";"
                     "\n            samplers[" << samplerIndex << "].AddressW = " << SamplerAddressModeToD3D12_TEXTURE_ADDRESS_MODE(sampler.addressMode) << ";"
                     "\n            samplers[" << samplerIndex << "].MipLODBias  = 0;"
-                    "\n            samplers[" << samplerIndex << "].MaxAnisotropy  = 0;"
+                    "\n            samplers[" << samplerIndex << "].MaxAnisotropy = " << SamplerMaxAnisotropyToUint(sampler.maxAnisotropy) << ";"
                     "\n            samplers[" << samplerIndex << "].ComparisonFunc  = D3D12_COMPARISON_FUNC_NEVER;"
                     "\n            samplers[" << samplerIndex << "].BorderColor  = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;"
                     "\n            samplers[" << samplerIndex << "].MinLOD = 0.0f;"
@@ -187,7 +187,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                     "\n            samplers[" << samplerIndex << "].AddressV = " << SamplerAddressModeToD3D12_TEXTURE_ADDRESS_MODE(sampler.addressMode) << ";"
                     "\n            samplers[" << samplerIndex << "].AddressW = " << SamplerAddressModeToD3D12_TEXTURE_ADDRESS_MODE(sampler.addressMode) << ";"
                     "\n            samplers[" << samplerIndex << "].MipLODBias  = 0;"
-                    "\n            samplers[" << samplerIndex << "].MaxAnisotropy  = 0;"
+                    "\n            samplers[" << samplerIndex << "].MaxAnisotropy = " << SamplerMaxAnisotropyToUint(sampler.maxAnisotropy) << ";"
                     "\n            samplers[" << samplerIndex << "].ComparisonFunc  = D3D12_COMPARISON_FUNC_NEVER;"
                     "\n            samplers[" << samplerIndex << "].BorderColor  = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;"
                     "\n            samplers[" << samplerIndex << "].MinLOD = 0.0f;"
@@ -1279,7 +1279,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                     ;
                 resourceTypeString = "DX12Utils::ResourceType::Buffer";
 
-                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
+                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occurred!");
                 RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
                 size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
                 rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
@@ -1449,7 +1449,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                     ;
                 resourceTypeString = "DX12Utils::ResourceType::Buffer";
 
-                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
+                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occurred!");
                 RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
                 size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
                 rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";
@@ -1620,7 +1620,7 @@ static void MakeStringReplacementForNode(std::unordered_map<std::string, std::os
                     ;
                 resourceTypeString = "DX12Utils::ResourceType::Buffer";
 
-                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occured!");
+                GigiAssert(renderGraph.nodes[dep.nodeIndex]._index == RenderGraphNode::c_index_resourceShaderConstants, "Unexpected problem occurred!");
                 RenderGraphNode_Resource_ShaderConstants& node = renderGraph.nodes[dep.nodeIndex].resourceShaderConstants;
                 size_t sizeInBytesAligned = ALIGN(256, renderGraph.structs[node.structure.structIndex].sizeInBytes);
                 rawAndStrideAndCount << ", false, " << sizeInBytesAligned << ", 1";

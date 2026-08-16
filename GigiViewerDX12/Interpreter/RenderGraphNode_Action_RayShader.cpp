@@ -88,10 +88,12 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 					return false;
 				}
 
+                if (!SamplerMaxAnisotropyToUint(sampler.maxAnisotropy, desc.MaxAnisotropy))
+                    return false;
+
 				desc.AddressV = desc.AddressW = desc.AddressU;
 
 				desc.MipLODBias = 0;
-				desc.MaxAnisotropy = 0;
 				desc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 				desc.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
 				desc.MinLOD = 0.0f;

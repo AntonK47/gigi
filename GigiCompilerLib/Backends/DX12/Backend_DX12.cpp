@@ -53,12 +53,38 @@ struct BackendDX12 : public BackendBase
             case SamplerFilter::MinMagMipPoint: return "D3D12_FILTER_MIN_MAG_MIP_POINT";
             case SamplerFilter::MinMagLinear_MipPoint: return "D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT";
             case SamplerFilter::MinMagMipLinear: return "D3D12_FILTER_MIN_MAG_MIP_LINEAR";
+            case SamplerFilter::Anisotropic: return "D3D12_FILTER_ANISOTROPIC";
             default:
             {
                 GigiAssert(false, "Unhandled SamplerFilter: %i", (int)filter);
                 return __FUNCTION__ " unhandled SamplerFilter";
             }
         }
+    }
+
+    static std::string SamplerMaxAnisotropyToUint(SamplerMaxAnisotropy maxAnisotropy)
+    {
+        switch (maxAnisotropy)
+        {
+        case SamplerMaxAnisotropy::x1: return "1";
+        case SamplerMaxAnisotropy::x2: return "2";
+        case SamplerMaxAnisotropy::x3: return "3";
+        case SamplerMaxAnisotropy::x4: return "4";
+        case SamplerMaxAnisotropy::x5: return "5";
+        case SamplerMaxAnisotropy::x6: return "6";
+        case SamplerMaxAnisotropy::x7: return "7";
+        case SamplerMaxAnisotropy::x8: return "8";
+        case SamplerMaxAnisotropy::x9: return "9";
+        case SamplerMaxAnisotropy::x10: return "10";
+        case SamplerMaxAnisotropy::x11: return "11";
+        case SamplerMaxAnisotropy::x12: return "12";
+        case SamplerMaxAnisotropy::x13: return "13";
+        case SamplerMaxAnisotropy::x14: return "14";
+        case SamplerMaxAnisotropy::x15: return "15";
+        case SamplerMaxAnisotropy::x16: return "16";
+        default: return "0";
+        }
+        return "0";
     }
 
     static std::string DrawCullModeToD3D12_CULL_MODE(DrawCullMode drawCullMode)

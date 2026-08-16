@@ -996,32 +996,33 @@ namespace FrontEndNodesNoCaching
         return name;
     }
 
+    // returns -1 if not found
+    inline int GetSamplerIndexByName(const std::vector<ShaderSampler>& samplers, const char* name)
+    {
+        for (size_t i = 0; i < samplers.size(); ++i)
+        {
+            if (samplers[i].name == name)
+                return (int)i;
+        }
+        return -1;
+    }
+
     // This function will return the base name if that name is not already taken.
     // Otherwise, it will append _%i, with an ever increasing integer value for i, until it is unique, and will return that.
     inline std::string GetUniqueShaderSamplerName(const Shader& shader, const char* baseName)
     {
-        int index = -1;
-        char name[1024];
-        while (1)
+        if (GetSamplerIndexByName(shader.samplers, baseName) == -1)
+            return baseName;
+
+        int samplerIndex = -1;
+        char samplerName[1024];
+        do
         {
-            if (index < 0)
-                strcpy_s(name, baseName);
-            else
-                sprintf_s(name, "%s_%i", baseName, index);
+            samplerIndex++;
+            sprintf_s(samplerName, "%s_%i", baseName, samplerIndex);
+        } while (GetSamplerIndexByName(shader.samplers, samplerName) != -1);
 
-            bool found = false;
-            for (const ShaderSampler& sampler : shader.samplers)
-            {
-                if (!_stricmp(sampler.name.c_str(), name))
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-                return name;
-        }
+        return samplerName;
     }
 
     // This function will return the base name if that name is not already taken.

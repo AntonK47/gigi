@@ -3209,53 +3209,62 @@ struct ShaderDataVisitor
                 }
                 else if (BeginsWith(token, tokenIndex, "Sampler:"))
                 {
-                    // min
-                    const char* minBegin = &token[tokenIndex];
-                    const char* minEnd = minBegin;
-                    while (*minEnd && *minEnd != ':' && *minEnd != ')')
-                        minEnd++;
-                    std::string minStr(minBegin, minEnd);
+                    std::vector<std::string> params;
+                    params.reserve(4);
 
-                    // mag
-                    const char* magBegin = (*minEnd == ':') ? minEnd + 1 : minEnd;
-                    const char* magEnd = magBegin;
-                    while (*magEnd && *magEnd != ':' && *magEnd != ')')
-                        magEnd++;
-                    std::string magStr(magBegin, magEnd);
+                    auto parseParam = [&](const char* begin) -> const char*
+                        {
+                            begin = (*begin == ':') ? begin + 1 : begin;
+                            const char* end = begin;
+                            while (*end && *end != ':' && *end != ')')
+                                end++;
+                            std::string str(begin, end);
+                            params.push_back(str);
+                            return end;
+                        };
 
-                    // mip
-                    const char* mipBegin = (*magEnd == ':') ? magEnd + 1 : magEnd;
-                    const char* mipEnd = mipBegin;
-                    while (*mipEnd && *mipEnd != ':' && *mipEnd != ')')
-                        mipEnd++;
-                    std::string mipStr(mipBegin, mipEnd);
-
-                    // Address Mode
-                    const char* addressBegin = (*mipEnd == ':') ? mipEnd + 1 : mipEnd;
-                    const char* addressEnd = addressBegin;
-                    while (*addressEnd && *addressEnd != ':' && *addressEnd != ')')
-                        addressEnd++;
-                    std::string addressStr(addressBegin, addressEnd);
-
-                    SamplerFilterComponent min, mag, mip;
-                    SamplerAddressMode address;
-                    if (!StringToEnum(minStr.c_str(), min) || !StringToEnum(magStr.c_str(), mag) || !StringToEnum(mipStr.c_str(), mip) || !StringToEnum(addressStr.c_str(), address))
+                    const char* tmp = &token[tokenIndex];
+                    while (*tmp != ')')
                     {
-                        GigiAssert(false, "Could not read sampler definition (min, mag, mip, addressMode) : (%s, %s, %s, %s)\nIn %s\n", minStr.c_str(), magStr.c_str(), mipStr.c_str(), addressStr.c_str(), path.c_str());
+                        tmp = parseParam(tmp);
                     }
+                    
+                    SamplerFilter samplerFilter = {};
+                    SamplerAddressMode address = {};
+                    SamplerMaxAnisotropy maxAnisotropy = {};
 
-                    SamplerFilter samplerFilter = SamplerFilter(
-                            int(SamplerFilter::MinMagMipPoint) +
-                            ((min == SamplerFilterComponent::Linear) ? 4 : 0) +
-                            ((mag == SamplerFilterComponent::Linear) ? 2 : 0) +
-                            ((mip == SamplerFilterComponent::Linear) ? 1 : 0));
+                    const bool isAnisotropicSampler = params[0] == "anisotropic";
+                    
+                    if (isAnisotropicSampler)
+                    {
+                        samplerFilter = SamplerFilter::Anisotropic;
+                        if (!StringToEnum(params[1].c_str(), maxAnisotropy) || !StringToEnum(params[2].c_str(), address))
+                        {
+                            GigiAssert(false, "Could not read sampler definition (anisotropic, maxAnisotropy, addressMode) : (%s, %s, %s)\nIn %s\n", params[0].c_str(), params[1].c_str(), params[2].c_str(), path.c_str());
+                        }
+                    }
+                    else
+                    {
+                        SamplerFilterComponent min, mag, mip;
+                        
+                        if (!StringToEnum(params[0].c_str(), min) || !StringToEnum(params[1].c_str(), mag) || !StringToEnum(params[2].c_str(), mip) || !StringToEnum(params[3].c_str(), address))
+                        {
+                            GigiAssert(false, "Could not read sampler definition (min, mag, mip, addressMode) : (%s, %s, %s, %s)\nIn %s\n", params[0].c_str(), params[1].c_str(), params[2].c_str(), params[3].c_str(), path.c_str());
+                        }
+
+                        samplerFilter = SamplerFilter(
+                                int(SamplerFilter::MinMagMipPoint) +
+                                ((min == SamplerFilterComponent::Linear) ? 4 : 0) +
+                                ((mag == SamplerFilterComponent::Linear) ? 2 : 0) +
+                                ((mip == SamplerFilterComponent::Linear) ? 1 : 0));
+                    }
 
                     // see if a suitable sampler already exists that we can re-use
                     bool samplerExists = false;
-                    std::string samplerName;
+                    std::string samplerName = {};
                     for (const ShaderSampler& sampler : shader.samplers)
                     {
-                        if (sampler.addressMode == address && sampler.filter == samplerFilter)
+                        if (sampler.addressMode == address && sampler.filter == samplerFilter && sampler.maxAnisotropy == maxAnisotropy)
                         {
                             samplerExists = true;
                             samplerName = sampler.name;
@@ -3271,6 +3280,7 @@ struct ShaderDataVisitor
                         newSampler.name = samplerName;
                         newSampler.filter = samplerFilter;
                         newSampler.addressMode = address;
+                        newSampler.maxAnisotropy = maxAnisotropy;
                         shader.samplers.push_back(newSampler);
                     }
 
@@ -3279,17 +3289,17 @@ struct ShaderDataVisitor
                     newReplacement.name = tokenStr;
                     newReplacement.value = samplerName;
 
-                    bool tokenReplacementExsts = false;
+                    bool tokenReplacementExists = false;
                     for (const TokenReplacement& tokenReplacement : shader.tokenReplacements)
                     {
                         if (tokenReplacement.name == newReplacement.name || tokenReplacement.value == newReplacement.value)
                         {
-                            tokenReplacementExsts = true;
+                            tokenReplacementExists = true;
                             break;
                         }
                     }
 
-                    if (!tokenReplacementExsts)
+                    if (!tokenReplacementExists)
                         shader.tokenReplacements.push_back(std::move(newReplacement));
                 }
                 else if (

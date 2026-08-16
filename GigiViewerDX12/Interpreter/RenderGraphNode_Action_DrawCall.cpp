@@ -87,7 +87,6 @@ bool GigiInterpreterPreviewWindowDX12::DrawCall_MakeRootSignature(const RenderGr
 				desc.AddressV = desc.AddressW = desc.AddressU;
 
 				desc.MipLODBias = 0;
-				desc.MaxAnisotropy = 0;
 				desc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 				desc.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
 				desc.MinLOD = 0.0f;
@@ -102,7 +101,7 @@ bool GigiInterpreterPreviewWindowDX12::DrawCall_MakeRootSignature(const RenderGr
 		if (node.pixelShader.shader)
 		{
 			for (size_t samplerIndex = 0; samplerIndex < node.pixelShader.shader->samplers.size(); ++samplerIndex)
-			{
+            {
 				const ShaderSampler& sampler = node.pixelShader.shader->samplers[samplerIndex];
 
 				D3D12_STATIC_SAMPLER_DESC desc;
@@ -112,11 +111,15 @@ bool GigiInterpreterPreviewWindowDX12::DrawCall_MakeRootSignature(const RenderGr
 
 				if (!SamplerAddressModeToD3D12AddressMode(sampler.addressMode, desc.AddressU))
 					return false;
+                
+                if (!SamplerMaxAnisotropyToUint(sampler.maxAnisotropy, desc.MaxAnisotropy))
+                    return false;
+
+                if (!SamplerMaxAnisotropyToUint(sampler.maxAnisotropy, desc.MaxAnisotropy))
+                    return false;
 
 				desc.AddressV = desc.AddressW = desc.AddressU;
-
 				desc.MipLODBias = 0;
-				desc.MaxAnisotropy = 0;
 				desc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 				desc.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
 				desc.MinLOD = 0.0f;
@@ -142,10 +145,12 @@ bool GigiInterpreterPreviewWindowDX12::DrawCall_MakeRootSignature(const RenderGr
 				if (!SamplerAddressModeToD3D12AddressMode(sampler.addressMode, desc.AddressU))
 					return false;
 
+                if (!SamplerMaxAnisotropyToUint(sampler.maxAnisotropy, desc.MaxAnisotropy))
+                    return false;
+
 				desc.AddressV = desc.AddressW = desc.AddressU;
 
 				desc.MipLODBias = 0;
-				desc.MaxAnisotropy = 0;
 				desc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 				desc.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
 				desc.MinLOD = 0.0f;
@@ -171,10 +176,12 @@ bool GigiInterpreterPreviewWindowDX12::DrawCall_MakeRootSignature(const RenderGr
 				if (!SamplerAddressModeToD3D12AddressMode(sampler.addressMode, desc.AddressU))
 					return false;
 
+                if (!SamplerMaxAnisotropyToUint(sampler.maxAnisotropy, desc.MaxAnisotropy))
+                    return false;
+
 				desc.AddressV = desc.AddressW = desc.AddressU;
 
 				desc.MipLODBias = 0;
-				desc.MaxAnisotropy = 0;
 				desc.ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
 				desc.BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
 				desc.MinLOD = 0.0f;
@@ -1608,7 +1615,7 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
                     return false;
                 }
 
-                // Verify numthreads for amplication shader if it exists
+                // Verify numthreads for amplification shader if it exists
                 if (node.amplificationShader.shader && (node.amplificationShader.shader->NumThreads[0] == 0 || node.amplificationShader.shader->NumThreads[1] == 0 || node.amplificationShader.shader->NumThreads[2] == 0))
                 {
                     m_logFn(LogLevel::Error, "Draw call node \"%s\" wanted to run amplification shader with 0 threads.  NumThreads = (%u, %u, %u)", node.name.c_str(), node.amplificationShader.shader->NumThreads[0], node.amplificationShader.shader->NumThreads[1], node.amplificationShader.shader->NumThreads[2]);

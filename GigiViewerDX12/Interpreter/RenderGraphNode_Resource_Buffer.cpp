@@ -116,7 +116,7 @@ static void WriteDummyMaterialShaderFile(const RenderGraph& renderGraph, const R
 
     out <<
         "Struct_" << structDesc.name << " Material_" << node.name << "_Level(StructuredBuffer<Struct_" << structDesc.name << "> MaterialsBuffer, int materialID, float2 uv0, float2 uv1, float2 uv2, float2 uv3, out float3 normal, out float occlusion,\n"
-        "    int lelevl = 0)\n"
+        "    int level = 0)\n"
         "{\n"
         << MakeDefaultMaterial(structDesc, "    ") <<
         "\n"
@@ -147,7 +147,7 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
 
     const Struct& structDesc = renderGraph.structs[desc.buffer.structIndex];
 
-    std::ostringstream out1, out2;
+    std::ostringstream out1, out2, out3;
 
     // Declare the gradient function
     out1 <<
@@ -196,6 +196,29 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
         "    ret = MaterialsBuffer[materialID];\n"
         ;
 
+    out3 <<
+        "Struct_" << structDesc.name << " Material_" << node.name << "(StructuredBuffer<Struct_" << structDesc.name << "> MaterialsBuffer, SamplerState sampler, int materialID, float2 uv0, float2 uv1, float2 uv2, float2 uv3, out float3 normal, out float occlusion,\n"
+        "    float2 uv0ddx = float2(0.0f, 0.0f), float2 uv0ddy = float2(0.0f, 0.0f), float2 uv1ddx = float2(0.0f, 0.0f), float2 uv1ddy = float2(0.0f, 0.0f),\n"
+        "    float2 uv2ddx = float2(0.0f, 0.0f), float2 uv2ddy = float2(0.0f, 0.0f), float2 uv3ddx = float2(0.0f, 0.0f), float2 uv3ddy = float2(0.0f, 0.0f))\n"
+        "{\n"
+        << MakeDefaultMaterial(structDesc, "    ") <<
+        "\n"
+        "    normal = float3(0.0f, 0.0f, 1.0f);\n"
+        "    occlusion = 1.0f;\n"
+        "\n"
+        "    float normalScale = 1.0f;\n"
+        "    float occlusionStrength = 1.0f;\n"
+        "\n"
+        "    uint materialCount, materialStride;\n"
+        "    MaterialsBuffer.GetDimensions(materialCount, materialStride);\n"
+        "\n"
+        "    if (materialID < 0 || materialID >= materialCount)\n"
+        "        return ret;\n"
+        "\n"
+        "    // Read material data from the buffer\n"
+        "    ret = MaterialsBuffer[materialID];\n"
+        ;
+
 
     enum class TextureOperation
     {
@@ -223,6 +246,26 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
         }
     ;
 
+    auto WriteTextureSampleGradUseParameterSampler = [&sceneData, &renderGraph](std::ostringstream& out, const char* objectName, const std::string& fieldName, TextureOperation textureOperation, const SceneData::Material::Texture& textureInfo, const char* options, const char* textureReadSuffix = "") -> bool
+        {
+            if (textureInfo.fileName.empty())
+                return false;
+
+            std::filesystem::path filePath = std::filesystem::proximate(std::filesystem::path(sceneData.filename).remove_filename() / textureInfo.fileName, renderGraph.baseDirectory);
+
+            const char* operation = nullptr;
+            switch (textureOperation)
+            {
+            case TextureOperation::Multiply: operation = "*="; break;
+            case TextureOperation::Assign: operation = "="; break;
+            }
+
+            out << "            " << objectName << fieldName << " " << operation << " /*$(Image2D:\"" << filePath.string() << "\"" << options << ")*/.SampleGrad(sampler, uv" << textureInfo.texCoordIndex << ", uv" << textureInfo.texCoordIndex << "ddx, uv" << textureInfo.texCoordIndex << "ddy)" << textureInfo.channels << textureReadSuffix << ";\n";
+
+            return true;
+        }
+    ;
+
     auto WriteTextureSampleLevel = [&sceneData, &renderGraph](std::ostringstream& out, const char* objectName, const std::string& fieldName, TextureOperation textureOperation, const SceneData::Material::Texture& textureInfo, const char* options, const char* textureReadSuffix = "") -> bool
         {
             if (textureInfo.fileName.empty())
@@ -243,7 +286,7 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
         }
     ;
 
-    std::ostringstream out1Switch, out2Switch;
+    std::ostringstream out1Switch, out2Switch, out3Switch;
     out1Switch <<
         "\n"
         "    // Sample the textures\n"
@@ -258,17 +301,25 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
         "    {\n"
         ;
 
+    out3Switch <<
+        "\n"
+        "    // Sample the textures\n"
+        "    switch(materialID)\n"
+        "    {\n"
+        ;
+
     int caseCount = 0;
     for (size_t materialIndex = 0; materialIndex < sceneData.materials.size(); ++materialIndex)
     {
         const SceneData::Material& material = sceneData.materials[materialIndex];
 
-        std::ostringstream out1SwitchCase, out2SwitchCase;
+        std::ostringstream out1SwitchCase, out2SwitchCase, out3SwitchCase;
 
         if (!material.name.empty())
         {
             out1SwitchCase << "        // " << material.name << "\n";
             out2SwitchCase << "        // " << material.name << "\n";
+            out3SwitchCase << "        // " << material.name << "\n";
         }
 
         out1SwitchCase <<
@@ -277,6 +328,11 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
             ;
 
         out2SwitchCase <<
+            "        case " << materialIndex << ":\n"
+            "        {\n"
+            ;
+
+        out3SwitchCase <<
             "        case " << materialIndex << ":\n"
             "        {\n"
             ;
@@ -287,12 +343,14 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
             wroteInCase = true;
             out1SwitchCase << "            normalScale = (float)" << material.normalScale << ";\n";
             out2SwitchCase << "            normalScale = (float)" << material.normalScale << ";\n";
+            out3SwitchCase << "            normalScale = (float)" << material.normalScale << ";\n";
         }
         if (material.occlusionStrength != 1.0f)
         {
             wroteInCase = true;
             out1SwitchCase << "            occlusionStrength = (float)" << material.occlusionStrength << ";\n";
             out2SwitchCase << "            occlusionStrength = (float)" << material.occlusionStrength << ";\n";
+            out3SwitchCase << "            occlusionStrength = (float)" << material.occlusionStrength << ";\n";
         }
 
         for (const StructField& field : structDesc.fields)
@@ -303,24 +361,28 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
                 {
                     wroteInCase |= WriteTextureSampleGrad(out1SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.baseColorTexture, ":Any:float4:true:true");
                     wroteInCase |= WriteTextureSampleLevel(out2SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.baseColorTexture, ":Any:float4:true:true");
+                    wroteInCase |= WriteTextureSampleGradUseParameterSampler(out3SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.baseColorTexture, ":Any:float4:true:true");
                     break;
                 }
                 case StructFieldSemantic::Material_Emissive:
                 {
                     wroteInCase |= WriteTextureSampleGrad(out1SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.emissiveTexture, ":Any:float4:true:true");
                     wroteInCase |= WriteTextureSampleLevel(out2SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.emissiveTexture, ":Any:float4:true:true");
+                    wroteInCase |= WriteTextureSampleGradUseParameterSampler(out3SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.emissiveTexture, ":Any:float4:true:true");
                     break;
                 }
                 case StructFieldSemantic::Material_Metallic:
                 {
                     wroteInCase |= WriteTextureSampleGrad(out1SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.metallicTexture, ":Any:float4:false:true");
                     wroteInCase |= WriteTextureSampleLevel(out2SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.metallicTexture, ":Any:float4:false:true");
+                    wroteInCase |= WriteTextureSampleGradUseParameterSampler(out3SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.metallicTexture, ":Any:float4:false:true");
                     break;
                 }
                 case StructFieldSemantic::Material_Roughness:
                 {
                     wroteInCase |= WriteTextureSampleGrad(out1SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.roughnessTexture, ":Any:float4:false:true");
                     wroteInCase |= WriteTextureSampleLevel(out2SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.roughnessTexture, ":Any:float4:false:true");
+                    wroteInCase |= WriteTextureSampleGradUseParameterSampler(out3SwitchCase, "ret.", field.name, TextureOperation::Multiply, material.roughnessTexture, ":Any:float4:false:true");
                     break;
                 }
             }
@@ -328,9 +390,11 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
 
         wroteInCase |= WriteTextureSampleGrad(out1SwitchCase, "", "normal", TextureOperation::Assign, material.normalTexture, ":Any:float4:false:true", " * 2.0f - 1.0f");
         wroteInCase |= WriteTextureSampleLevel(out2SwitchCase, "", "normal", TextureOperation::Assign, material.normalTexture, ":Any:float4:false:true", " * 2.0f - 1.0f");
+        wroteInCase |= WriteTextureSampleGradUseParameterSampler(out3SwitchCase, "", "normal", TextureOperation::Assign, material.normalTexture, ":Any:float4:false:true", " * 2.0f - 1.0f");
 
         wroteInCase |= WriteTextureSampleGrad(out1SwitchCase, "", "occlusion", TextureOperation::Assign, material.occlusionTexture, ":Any:float4:false:true");
         wroteInCase |= WriteTextureSampleLevel(out2SwitchCase, "", "occlusion", TextureOperation::Assign, material.occlusionTexture, ":Any:float4:false:true");
+        wroteInCase |= WriteTextureSampleGradUseParameterSampler(out3SwitchCase, "", "occlusion", TextureOperation::Assign, material.occlusionTexture, ":Any:float4:false:true");
         out1SwitchCase <<
             "            break;\n"
             "        }\n"
@@ -341,15 +405,22 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
             "        }\n"
             ;
 
+        out3SwitchCase <<
+            "            break;\n"
+            "        }\n"
+            ;
+
         if (wroteInCase)
         {
             if (caseCount > 0)
             {
                 out1Switch << "\n";
                 out2Switch << "\n";
+                out3Switch << "\n";
             }
             out1Switch << out1SwitchCase.str();
             out2Switch << out2SwitchCase.str();
+            out3Switch << out3SwitchCase.str();
             caseCount++;
         }
     }
@@ -362,10 +433,15 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
         "    }\n"
         ;
 
+    out3Switch <<
+        "    }\n"
+        ;
+
     if (caseCount > 0)
     {
         out1 << out1Switch.str();
         out2 << out2Switch.str();
+        out3 << out3Switch.str();
     }
 
     out1 <<
@@ -374,6 +450,11 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
         ;
 
     out2 <<
+        "\n"
+        "    normal = normalize((normal * 2.0f - 1.0f) * float3(normalScale, normalScale, 1.0f));\n"
+        ;
+
+    out3 <<
         "\n"
         "    normal = normalize((normal * 2.0f - 1.0f) * float3(normalScale, normalScale, 1.0f));\n"
         ;
@@ -387,6 +468,9 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
                 "    ret." << field.name << ".rgb = lerp(ret." << field.name << ".rgb, ret." << field.name << ".rgb * occlusion, occlusionStrength);\n"
                 ;
             out2 <<
+                "    ret." << field.name << ".rgb = lerp(ret." << field.name << ".rgb, ret." << field.name << ".rgb * occlusion, occlusionStrength);\n"
+                ;
+            out3 <<
                 "    ret." << field.name << ".rgb = lerp(ret." << field.name << ".rgb, ret." << field.name << ".rgb * occlusion, occlusionStrength);\n"
                 ;
             break;
@@ -404,8 +488,13 @@ static void WriteMaterialShaderFile(const RenderGraph& renderGraph, const Render
         "    return ret;\n"
         "};\n";
 
-    // Append out2 to out1
-    out1 << "\n" << out2.str();
+    out3 <<
+        "\n"
+        "    return ret;\n"
+        "};\n";
+
+    // Append out2 and out3 to out1
+    out1 << "\n" << out2.str() << "\n" << out3.str();
 
     // Only write the file if it has changed.
     std::string filePath(desc.buffer.materialShaderFile);
