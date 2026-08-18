@@ -1,0 +1,38 @@
+{
+    "version": "2.0",
+    "systemVars": {
+        "ProjMtx_textureName": "Output"
+    },
+    "snapshot": {
+        "resourceViewNodeIndex": 0,
+        "resourceViewResourceIndex": 6,
+        "importedResources": [
+            {
+                "nodeName": "Scene",
+                "resetEveryFrame": false,
+                "isATexture": false,
+                "buffer": {
+                    "fileName": "IndirectRtVb.bin",
+                    "loadBufferAs": "Binary",
+                    "structIndex": 0,
+                    "BLASOpaque": true
+                }
+            },
+            {
+                "nodeName": "SceneVertexBuffer",
+                "isATexture": false,
+                "buffer": {
+                    "fileName": "IndirectRtVb.bin",
+                    "loadBufferAs": "Binary",
+                    "structIndex": 0
+                }
+            }
+        ],
+        "savedVariables": [
+            {
+                "name": "IndirectRtRayGen_GpuAddress",
+                "value": "291524608"
+            }
+        ]
+    }
+}

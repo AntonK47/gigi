@@ -538,6 +538,29 @@ inline std::vector<NodePinInfo> GetNodePins(const RenderGraph& renderGraph, Rend
     size_t numNewConnections = RebuildShaderNodePins<RenderGraphNode_Action_RayShader>(renderGraph, shaderIndex, node, 0, ret);
     node.connections.resize(numNewConnections);
 
+    // make a pin for indirect dispatch
+    if (node.enableIndirect)
+    {
+        {
+            NodePinInfo pin;
+            pin.name = "indirectBuffer";
+            pin.inputNode = &node.indirectExecution.indirectBuffer.node;
+            pin.inputNodePin = &node.indirectExecution.indirectBuffer.pin;
+            pin.accessLabel = " (R)";
+            pin.required = false;
+            ret.push_back(pin);
+        }
+        {
+            NodePinInfo pin;
+            pin.name = "indirectCountBuffer";
+            pin.inputNode = &node.indirectExecution.indirectCountBuffer.node;
+            pin.inputNodePin = &node.indirectExecution.indirectCountBuffer.pin;
+            pin.accessLabel = " (R)";
+            pin.required = false;
+            ret.push_back(pin);
+        }
+    }
+
     return ret;
 }
 

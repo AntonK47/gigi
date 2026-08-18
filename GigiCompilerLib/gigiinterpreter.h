@@ -345,7 +345,7 @@ public:
 		// Get a Gigi temporary directory based on the process ID so multiple viewers can run at once
         std::string tempDirectory = GetTempDirectory();
 
-		// Remove everything aready there, to prevent stale things interfering
+		// Remove everything ready there, to prevent stale things interfering
 		// Then, make sure the directory is created
 		std::error_code ec;
 		std::filesystem::remove_all(tempDirectory.c_str(), ec);

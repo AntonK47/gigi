@@ -222,7 +222,7 @@ STRUCT_BEGIN(SubGraphVariableSettings, "Cached data about a subgraph")
     STRUCT_FIELD(VariableVisibility, visibility, VariableVisibility::Internal, "Who can see and interact with this variable", 0)
     STRUCT_FIELD(std::string, replaceWithStr, {}, "If set, the subgraph variable will be deleted and all references will use this parent graph variable instead.", 0)
     STRUCT_FIELD(std::string, replaceWithValue, {}, "Replace the variable with a literal value. At gigi compile time it makes an internal private variable of the correct type with this string as the default value.", 0)
-    STRUCT_FIELD(bool, isLoopIndex, false, "If true, this variable will recieve the loop index.", 0)
+    STRUCT_FIELD(bool, isLoopIndex, false, "If true, this variable will receive the loop index.", 0)
 
     // deprecated in 0.97b
     // replaced by replaceWithStr
@@ -284,8 +284,8 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_ResourceBase, RenderGraphNode_Base, "The ba
 
     STRUCT_CONST(bool, c_isResourceNode, true, "Whether or not this is a resource node.", SCHEMA_FLAG_NO_SERIALIZE)
 
-    STRUCT_FIELD(ShaderResourceAccessType, startingState, ShaderResourceAccessType::Count, "The first state that a reosurce is in. Calculated for convenience.", SCHEMA_FLAG_NO_SERIALIZE)
-    STRUCT_FIELD(ShaderResourceAccessType, finalState, ShaderResourceAccessType::Count, "The last state that a reosurce is in. Calculated for convenience.", SCHEMA_FLAG_NO_SERIALIZE)
+    STRUCT_FIELD(ShaderResourceAccessType, startingState, ShaderResourceAccessType::Count, "The first state that a resource is in. Calculated for convenience.", SCHEMA_FLAG_NO_SERIALIZE)
+    STRUCT_FIELD(ShaderResourceAccessType, finalState, ShaderResourceAccessType::Count, "The last state that a resource is in. Calculated for convenience.", SCHEMA_FLAG_NO_SERIALIZE)
 
     STRUCT_FIELD(unsigned int, accessedAs, 0, "A bitfield of all the ways this resource is accessed (ShaderResourceAccessType). Useful for creating resources with the correct usage flags.", SCHEMA_FLAG_NO_SERIALIZE)
     STRUCT_FIELD(unsigned int, originallyAccessedAs, 0, "Same as accessedAs, but uses original access instead of access, in case access was modified", SCHEMA_FLAG_NO_SERIALIZE)
@@ -296,7 +296,7 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_ActionBase, RenderGraphNode_Base, "The base
     STRUCT_DYNAMIC_ARRAY(ResourceDependency, resourceDependencies, "Filled in before backend code is called.", SCHEMA_FLAG_NO_SERIALIZE)
     STRUCT_FIELD(Condition, condition, {}, "An optional condition added for the action to happen", SCHEMA_FLAG_UI_COLLAPSABLE)
 
-    STRUCT_DYNAMIC_ARRAY(LinkProperties, linkProperties, "Specify array index / mip level for each pin. Should be same size and order as GetNodePins family of functons.", SCHEMA_FLAG_NO_UI)
+    STRUCT_DYNAMIC_ARRAY(LinkProperties, linkProperties, "Specify array index / mip level for each pin. Should be same size and order as GetNodePins family of functions.", SCHEMA_FLAG_NO_UI)
 
     STRUCT_DYNAMIC_ARRAY(NodePinConnection, connections, "What is plugged into the pins", SCHEMA_FLAG_NO_UI)
     STRUCT_FIELD(bool, hideInViewer, false, "Whether this node is only intermediate and should be hidden in a viewer.", SCHEMA_FLAG_NONE)
@@ -330,7 +330,7 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_Resource_ShaderConstants, RenderGraphNode_R
     STRUCT_DYNAMIC_ARRAY(SetCBFromVar, setFromVar, "Set constant buffer (left) to the value of variable (right) every execution", SCHEMA_FLAG_UI_COLLAPSABLE | SCHEMA_FLAG_UI_ARRAY_FATITEMS)
 STRUCT_END()
 
-STRUCT_BEGIN(Resource_Texture_MSAA, "Sttings only used for Texture2DMS")
+STRUCT_BEGIN(Resource_Texture_MSAA, "Settings only used for Texture2DMS")
     STRUCT_FIELD(unsigned int, sampleCount, 2, "MSAA sample count, usually 2 or 4, most hardware also has 8 and some even 16 or more.", 0)
     STRUCT_FIELD(bool, hideUI, false, "Used by UI system to know whether to show this or not", SCHEMA_FLAG_NO_SERIALIZE)
 STRUCT_END()
@@ -373,6 +373,15 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_ComputeShader, RenderGraphNode_Actio
     STRUCT_FIELD(bool, enableIndirect, false, "If true, shows and enables indirectBuffer input", 0)
 STRUCT_END()
 
+STRUCT_BEGIN(IndirectExecution, "Indirect execution parameters.")
+STRUCT_FIELD(NodePinReferenceOptional, indirectBuffer, {}, "If given, this buffer will be used as an indirect dispatch buffer, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
+STRUCT_FIELD(NodePinReferenceOptional, indirectCountBuffer, {}, "If given, this buffer will be used as an indirect count buffer, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
+
+STRUCT_FIELD(ValueOrVariable_Uint, indirectMaxCount, { 1 }, "The max count of indirect draw calls.", 0)
+STRUCT_FIELD(ValueOrVariable_Uint, indirectOffset, { }, "The offset into the indirect argument buffer in 4 byte units.", 0)
+STRUCT_FIELD(ValueOrVariable_Uint, indirectCountOffset, { }, "The offset into the counter value in 4 byte units.", 0)
+STRUCT_END()
+
 STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_RayShader, RenderGraphNode_ActionBase, "Executes a dispatch rays shader")
     STRUCT_CONST(std::string, c_editorName, "Ray Gen Shader", "Used by the editor.", SCHEMA_FLAG_NO_SERIALIZE)
     STRUCT_CONST(std::string, c_shortTypeName, "RayGen", "Used by the editor.", SCHEMA_FLAG_NO_SERIALIZE)
@@ -382,12 +391,16 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_RayShader, RenderGraphNode_ActionBas
     STRUCT_FIELD(RayGenShaderReference, shader, {}, "The ray gen shader.", 0)
     STRUCT_FIELD(ShaderVariableAliases, shaderVariableAliases, {}, "", 0)
     STRUCT_FIELD(RayDispatchSizeDesc, dispatchSize, {}, "The dispatch size.", SCHEMA_FLAG_UI_COLLAPSABLE)
+    
+    //Indirect execution specific
+    STRUCT_FIELD(IndirectExecution, indirectExecution, {}, "Indirect execution settings.", SCHEMA_FLAG_UI_COLLAPSABLE)
 
     STRUCT_FIELD(std::string, entryPoint, "", "The shader entrypoint. Overrides the shader entry entryPoint.  Handled by front end during Gigi compilation and becomes shader entry point during code gen.", 0)
     STRUCT_DYNAMIC_ARRAY(ShaderDefine, defines, "The defines the shader is compiled with, on top of whatever defines the shader has already. Handled by front end during Gigi compilation and becomes shader defines during code gen.", SCHEMA_FLAG_UI_COLLAPSABLE)
 
     STRUCT_FIELD(int, maxRecursionDepth, 3, "The maximum recursion depth of the ray.", 0)
     STRUCT_FIELD(unsigned int, rayPayloadSize, 64, "The size of the ray payload, in bytes. 64 bytes is four float4s.", 0)
+    STRUCT_FIELD(bool, enableIndirect, false, "If true, shows and enables indirectBuffer input", 0)
 STRUCT_END()
 
 STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_CopyResource, RenderGraphNode_ActionBase, "Copies a resource to another resource")
@@ -418,15 +431,6 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_WorkGraph, RenderGraphNode_ActionBas
     STRUCT_DYNAMIC_ARRAY(ShaderDefine, defines, "The defines the shaders ares compiled with, on top of whatever defines the shaders have already", SCHEMA_FLAG_UI_COLLAPSABLE)
 STRUCT_END()
 
-STRUCT_BEGIN(IndirectExecution, "Indirect execution parameters.")
-    STRUCT_FIELD(NodePinReferenceOptional, indirectBuffer, {}, "If given, this buffer will be used as an indirect dispatch buffer, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
-    STRUCT_FIELD(NodePinReferenceOptional, indirectCountBuffer, {}, "If given, this buffer will be used as an indirect count buffer, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
-
-    STRUCT_FIELD(ValueOrVariable_Uint, indirectMaxCount, { 1 }, "The max count of indirect draw calls.", 0)
-    STRUCT_FIELD(ValueOrVariable_Uint, indirectOffset, { }, "The offset into the indirect dispatch buffer. 0 would be the start of the buffer, 1 would start at the 4th value in the buffer, and so on.", 0)
-    STRUCT_FIELD(ValueOrVariable_Uint, indirectCountOffset, { }, "The offset in 4 byte units into the indirect count buffer.", 0)
-STRUCT_END()
-
 STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_DrawCall, RenderGraphNode_ActionBase, "Rasterization")
     STRUCT_CONST(std::string, c_editorName, "Draw Call", "Used by the editor.", SCHEMA_FLAG_NO_SERIALIZE)
     STRUCT_CONST(std::string, c_shortTypeName, "Draw", "Used by the editor.", SCHEMA_FLAG_NO_SERIALIZE)
@@ -442,10 +446,10 @@ STRUCT_INHERIT_BEGIN(RenderGraphNode_Action_DrawCall, RenderGraphNode_ActionBase
     STRUCT_FIELD(PixelShaderReference, pixelShader, {}, "The pixel shader.", 0)
     STRUCT_FIELD(ShaderVariableAliases, pixelShaderVariableAliases, {}, "", 0)
 
-    //NOTE: this field exists only for backward compartability reasoans, use indirect execution insteed
+    //NOTE: this field exists only for backward comparability reasons, use indirect execution instead
     STRUCT_FIELD(NodePinReferenceOptional, indirectBuffer, {}, "Indirect buffer to make this draw use ExecuteIndirect, only used if enableIndirect", SCHEMA_FLAG_NO_UI)
 
-    //Indirect ecexution specific
+    //Indirect execution specific
     STRUCT_FIELD(IndirectExecution, indirectExecution, {}, "Indirect execution settings.", SCHEMA_FLAG_UI_COLLAPSABLE)
 
     // Vertex shader specific

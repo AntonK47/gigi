@@ -318,6 +318,11 @@ struct RenameReferencesVisitor
                 m_renameData.UpdateNodeName(node.dispatchSize.node.name);
                 m_renameData.UpdateVariableName(node.dispatchSize.variable.name);
 
+                m_renameData.UpdateNodePin(node.indirectExecution.indirectBuffer.node, node.indirectExecution.indirectBuffer.pin);
+                m_renameData.UpdateNodeName(node.indirectExecution.indirectBuffer.node);
+                m_renameData.UpdateNodePin(node.indirectExecution.indirectCountBuffer.node, node.indirectExecution.indirectCountBuffer.pin);
+                m_renameData.UpdateNodeName(node.indirectExecution.indirectCountBuffer.node);
+
                 for (NodePinConnection& connection : node.connections)
                 {
                     m_renameData.UpdateNodePin(connection.dstNode, connection.dstPin);

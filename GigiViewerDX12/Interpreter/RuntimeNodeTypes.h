@@ -235,6 +235,8 @@ struct RuntimeTypes
 
         ID3D12Resource* m_shaderTableHitGroup = nullptr;
         unsigned int m_shaderTableHitGroupSize = 0;
+
+        ID3D12CommandSignature* m_commandSignature = nullptr;
     };
 
     struct RenderGraphNode_Action_CopyResource : public RenderGraphNode_Base

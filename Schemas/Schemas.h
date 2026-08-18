@@ -181,7 +181,7 @@ ENUM_BEGIN(SetVariableOperator, "")
     ENUM_ITEM(BitwiseXor, "A ^ B")
     ENUM_ITEM(BitwiseNot, "~A")
 
-    ENUM_ITEM(Noop, "Dont do anything, returns the left value. Useful for assignment. This does implicit type casting.")
+    ENUM_ITEM(Noop, "Don't do anything, returns the left value. Useful for assignment. This does implicit type casting.")
 ENUM_END()
 
 STRUCT_BEGIN(SetVariable, "A variable modification")
