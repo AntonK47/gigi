@@ -1689,8 +1689,8 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 
 
 			// Note: maybe this could move earlier, so there isn't an extra transition call here. like in the descriptor table logic even though it doesn't go in the descriptor table?
-			//m_transitions.Transition(TRANSITION_DEBUG_INFO(resourceInfo.m_resource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
-			//m_transitions.Flush(m_commandList);
+			m_transitions.Transition(TRANSITION_DEBUG_INFO(resourceInfo.m_resource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
+			m_transitions.Flush(m_commandList);
 
 
             m_transitions.Transition(TRANSITION_DEBUG_INFO(resourceInfo.m_resource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
@@ -1768,7 +1768,7 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 					m_commandSignatureDrawIndexed,
                     maxCommandCount,
 					resourceInfo.m_resource,
-                    argumentBufferOffset * sizeof(UINT),
+                    argumentBufferOffset * sizeof(D3D12_DRAW_INDEXED_ARGUMENTS),
                     indirectCountBufferResource,
                     argumentCountBufferOffset * sizeof(UINT));
 			}
@@ -1779,7 +1779,7 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 					m_commandSignatureDraw,
                     maxCommandCount,
 					resourceInfo.m_resource,
-					argumentBufferOffset * sizeof(UINT),
+					argumentBufferOffset * sizeof(D3D12_DRAW_ARGUMENTS),
 					indirectCountBufferResource,
                     argumentCountBufferOffset * sizeof(UINT));
 			}

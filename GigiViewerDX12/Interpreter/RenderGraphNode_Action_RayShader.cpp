@@ -54,12 +54,6 @@ void RuntimeTypes::RenderGraphNode_Action_RayShader::Release(GigiInterpreterPrev
 		interpreter.m_delayedRelease.Add(m_shaderTableHitGroup);
 		m_shaderTableHitGroup = nullptr;
 	}
-
-    if (m_commandSignature)
-    {
-        interpreter.m_delayedRelease.Add(m_commandSignature);
-        m_commandSignature = nullptr;
-    }
 }
 
 bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action_RayShader& node, RuntimeTypes::RenderGraphNode_Action_RayShader& runtimeData, NodeAction nodeAction)
@@ -115,27 +109,17 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 			std::vector<D3D12_DESCRIPTOR_RANGE> ranges;
 			BuildDescriptorRanges(node.shader.shader, ranges);
 
-            std::vector< D3D12_ROOT_PARAMETER> rootParams;
 			// Root parameter
 			D3D12_ROOT_PARAMETER rootParam;
 			rootParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 			rootParam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-			rootParam.DescriptorTable.NumDescriptorRanges = static_cast<UINT>(ranges.size());
+			rootParam.DescriptorTable.NumDescriptorRanges = (UINT)ranges.size();
 			rootParam.DescriptorTable.pDescriptorRanges = ranges.data();
-            rootParams.push_back(rootParam);
-
-            D3D12_ROOT_PARAMETER rootConstantParam = {};
-            rootConstantParam.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
-            rootConstantParam.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-            rootConstantParam.Constants.Num32BitValues = 1;
-            rootConstantParam.Constants.ShaderRegister = 0;
-            rootConstantParam.Constants.RegisterSpace = 1000;
-            rootParams.push_back(rootConstantParam);
 
 			D3D12_ROOT_SIGNATURE_DESC rootDesc = {};
-			rootDesc.NumParameters = static_cast<UINT>(rootParams.size());
-			rootDesc.pParameters = rootParams.data();
-			rootDesc.NumStaticSamplers = static_cast<UINT>(samplers.size());
+			rootDesc.NumParameters = 1;
+			rootDesc.pParameters = &rootParam;
+			rootDesc.NumStaticSamplers = (UINT)samplers.size();
 			rootDesc.pStaticSamplers = samplers.data();
 			rootDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
 
@@ -179,43 +163,6 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 			// name the root signature for debuggers
 			runtimeData.m_rootSignature->SetName(ToWideString(node.name.c_str()).c_str());
 		}
-
-        // Create Command Signature
-        {
-            D3D12_INDIRECT_ARGUMENT_DESC dispatchArg = {};
-            dispatchArg.Type = D3D12_INDIRECT_ARGUMENT_TYPE_DISPATCH_RAYS;
-
-            D3D12_INDIRECT_ARGUMENT_DESC incrementConst = {};
-            incrementConst.Type = D3D12_INDIRECT_ARGUMENT_TYPE_INCREMENTING_CONSTANT;
-            incrementConst.IncrementingConstant.RootParameterIndex = 1;
-            incrementConst.IncrementingConstant.DestOffsetIn32BitValues = 0;
-
-            std::array< D3D12_INDIRECT_ARGUMENT_DESC, 2> dispatchArguments;
-            dispatchArguments[0] = incrementConst;
-            dispatchArguments[1] = dispatchArg;
-
-            D3D12_COMMAND_SIGNATURE_DESC dispatchDesc = {};
-            dispatchDesc.ByteStride = sizeof(D3D12_DISPATCH_RAYS_DESC);
-            dispatchDesc.NumArgumentDescs = static_cast<UINT>(dispatchArguments.size());
-            dispatchDesc.pArgumentDescs = dispatchArguments.data();
-            dispatchDesc.NodeMask = 0x0;
-
-            const HRESULT hr = m_device->CreateCommandSignature(
-                &dispatchDesc,
-                runtimeData.m_rootSignature,
-                IID_PPV_ARGS(&runtimeData.m_commandSignature));
-
-            ID3DBlob* error = nullptr;
-            if (FAILED(hr))
-            {
-                const char* errorMsg = (error ? (const char*)error->GetBufferPointer() : nullptr);
-                if (errorMsg)
-                    m_logFn(LogLevel::Error, "Could not create command signature: %s", errorMsg);
-                if (error) error->Release();
-                return false;
-            }
-            runtimeData.m_commandSignature->SetName(ToWideString(node.name.c_str()).c_str());
-        }
 
 		// Compile the shaders
 		std::vector<ShaderExport> shaderExports;
@@ -616,13 +563,6 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 
 	if (nodeAction == NodeAction::Execute)
 	{
-        {
-            varIndex++;
-            if (varIndex >= GetRuntimeVariableCount())
-                break;
-            const auto variableName = std::format("{}_GpuAddress", node.shader.name);
-
-            if (variable.name == variableName && variable.type == DataFieldType::Uint_64)
 		// publish SRVs and UAVs as viewable textures, before the shader execution
 		int depIndex = -1;
 		for (const ResourceDependency& dep : node.resourceDependencies)
@@ -790,147 +730,29 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 				return false;
 			}
 
-            if (node.enableIndirect)
-            {
-                bool indirectCountBufferExists = false;
-                ID3D12Resource* indirectCountBufferResource = nullptr;
-                ID3D12Resource* indirectArgumentBufferResource = nullptr;
+			m_dxrCommandList->SetComputeRootSignature(runtimeData.m_rootSignature);
+			m_dxrCommandList->SetPipelineState1(runtimeData.m_stateObject);
+			m_dxrCommandList->SetComputeRootDescriptorTable(0, descriptorTable);
 
-                const std::string& indirectBufferName = m_renderGraph.nodes[node.indirectExecution.indirectBuffer.resourceNodeIndex].resourceBuffer.name;
-                bool exists = false;
-                const RuntimeTypes::RenderGraphNode_Resource_Buffer& indirectBufferResourceInfo = GetRuntimeNodeData_RenderGraphNode_Resource_Buffer(indirectBufferName.c_str(), exists);
-                if (!exists)
-                {
-                    return true;
-                }
+			D3D12_DISPATCH_RAYS_DESC dispatchDesc = {};
+			dispatchDesc.Width = dispatchSize[0];
+			dispatchDesc.Height = dispatchSize[1];
+			dispatchDesc.Depth = dispatchSize[2];
 
-                std::string label = node.name + std::string(".indirectBuffer") + std::string(": ") + indirectBufferName;
-                runtimeData.HandleViewableBuffer(*this, label.c_str(), indirectBufferResourceInfo.m_resource, indirectBufferResourceInfo.m_format, indirectBufferResourceInfo.m_formatCount, indirectBufferResourceInfo.m_structIndex, indirectBufferResourceInfo.m_size, indirectBufferResourceInfo.m_stride, indirectBufferResourceInfo.m_count, false, false, 0, 0, false);
+			dispatchDesc.RayGenerationShaderRecord.StartAddress = runtimeData.m_shaderTableRayGen->GetGPUVirtualAddress();
+			dispatchDesc.RayGenerationShaderRecord.SizeInBytes = D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT;
 
-                indirectArgumentBufferResource = indirectBufferResourceInfo.m_resource;
+			if (runtimeData.m_shaderTableMiss)
+				dispatchDesc.MissShaderTable.StartAddress = runtimeData.m_shaderTableMiss->GetGPUVirtualAddress();
+			dispatchDesc.MissShaderTable.SizeInBytes = runtimeData.m_shaderTableMissSize;
+			dispatchDesc.MissShaderTable.StrideInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
 
+			if (runtimeData.m_shaderTableHitGroup)
+				dispatchDesc.HitGroupTable.StartAddress = runtimeData.m_shaderTableHitGroup->GetGPUVirtualAddress();
+			dispatchDesc.HitGroupTable.SizeInBytes = runtimeData.m_shaderTableHitGroupSize;
+			dispatchDesc.HitGroupTable.StrideInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
 
-                if (node.indirectExecution.indirectCountBuffer.resourceNodeIndex != -1)
-                {
-                    // Get the indirect count buffer and publish it as a viewable resource if the resource differ form the indirect buffer
-                    const std::string& indirectCountBufferName = m_renderGraph.nodes[node.indirectExecution.indirectCountBuffer.resourceNodeIndex].resourceBuffer.name;
-
-                    const RuntimeTypes::RenderGraphNode_Resource_Buffer& indirectCountBufferResourceInfo = GetRuntimeNodeData_RenderGraphNode_Resource_Buffer(indirectCountBufferName.c_str(), indirectCountBufferExists);
-
-                    // Note: It might be handy to publish the resource even if the resource is the same as indirect buffer resource.
-                    if (indirectCountBufferExists && indirectCountBufferResourceInfo.m_resource != indirectBufferResourceInfo.m_resource)
-                    {
-                        std::string indirectCountBufferLabel = node.name + std::string(".indirectCountBuffer") + std::string(": ") + indirectCountBufferName;
-                        runtimeData.HandleViewableBuffer(*this, indirectCountBufferLabel.c_str(), indirectCountBufferResourceInfo.m_resource, indirectCountBufferResourceInfo.m_format, indirectCountBufferResourceInfo.m_formatCount, indirectCountBufferResourceInfo.m_structIndex, indirectCountBufferResourceInfo.m_size, indirectCountBufferResourceInfo.m_stride, indirectCountBufferResourceInfo.m_count, false, false, 0, 0, false);
-                    }
-
-                    indirectCountBufferResource = indirectCountBufferResourceInfo.m_resource;
-                }
-
-                // Get the indirect buffer offset
-                UINT64 argumentBufferOffset = node.indirectExecution.indirectOffset.value;
-                if (node.indirectExecution.indirectOffset.variable.variableIndex != -1)
-                {
-                    GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectOffset.variable.variableIndex);
-                    switch (rtVar.variable->type)
-                    {
-                    case DataFieldType::Uint:
-                    {
-                        argumentBufferOffset = static_cast<UINT64>(*(UINT*)rtVar.storage.value);
-                        break;
-                    }
-                    default:
-                    {
-                        m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Offset variable \"%s\" in draw node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
-                        return false;
-                    }
-                    }
-                }
-
-                m_transitions.Transition(TRANSITION_DEBUG_INFO(indirectArgumentBufferResource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
-
-                if (indirectCountBufferExists && indirectCountBufferResource != indirectArgumentBufferResource)
-                {
-                    m_transitions.Transition(TRANSITION_DEBUG_INFO(indirectCountBufferResource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
-                }
-                m_transitions.Flush(m_commandList);
-
-                // Get the indirect count buffer offset
-                UINT64 argumentCountBufferOffset = node.indirectExecution.indirectCountOffset.value;
-                if (node.indirectExecution.indirectCountOffset.variable.variableIndex != -1)
-                {
-                    GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectCountOffset.variable.variableIndex);
-                    switch (rtVar.variable->type)
-                    {
-                    case DataFieldType::Uint:
-                    {
-                        argumentCountBufferOffset = static_cast<UINT64>(*(UINT*)rtVar.storage.value);
-                        break;
-                    }
-                    default:
-                    {
-                        m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Count Offset variable \"%s\" in draw node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
-                        return false;
-                    }
-                    }
-                }
-
-                UINT maxCommandCount = static_cast<UINT>((std::max)({ node.indirectExecution.indirectMaxCount.value, 1u }));
-                if (node.indirectExecution.indirectMaxCount.variable.variableIndex != -1)
-                {
-                    GigiInterpreterPreviewWindowDX12::RuntimeVariable rtVar = GetRuntimeVariable(node.indirectExecution.indirectMaxCount.variable.variableIndex);
-                    switch (rtVar.variable->type)
-                    {
-                    case DataFieldType::Uint:
-                    {
-                        maxCommandCount = *(UINT*)rtVar.storage.value;
-                        break;
-                    }
-                    default:
-                    {
-                        m_logFn(LogLevel::Error, "Unhandled data type \"%s\" for Indirect Max Count variable \"%s\" in draw node \"%s\"", EnumToString(rtVar.variable->type), rtVar.variable->name.c_str(), node.name.c_str());
-                        return false;
-                    }
-                    }
-                }
-                
-                m_dxrCommandList->SetComputeRootSignature(runtimeData.m_rootSignature);
-                m_dxrCommandList->SetPipelineState1(runtimeData.m_stateObject);
-                m_dxrCommandList->SetComputeRootDescriptorTable(0, descriptorTable);
-                m_commandList->ExecuteIndirect(
-                    runtimeData.m_commandSignature,
-                    maxCommandCount,
-                    indirectArgumentBufferResource,
-                    argumentBufferOffset * sizeof(UINT),
-                    indirectCountBufferResource,
-                    argumentCountBufferOffset * sizeof(UINT));
-            }
-            else
-            {
-                m_dxrCommandList->SetComputeRootSignature(runtimeData.m_rootSignature);
-                m_dxrCommandList->SetPipelineState1(runtimeData.m_stateObject);
-                m_dxrCommandList->SetComputeRootDescriptorTable(0, descriptorTable);
-
-                D3D12_DISPATCH_RAYS_DESC dispatchDesc = {};
-                dispatchDesc.Width = dispatchSize[0];
-                dispatchDesc.Height = dispatchSize[1];
-                dispatchDesc.Depth = dispatchSize[2];
-
-                dispatchDesc.RayGenerationShaderRecord.StartAddress = runtimeData.m_shaderTableRayGen->GetGPUVirtualAddress();
-                dispatchDesc.RayGenerationShaderRecord.SizeInBytes = D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT;
-
-                if (runtimeData.m_shaderTableMiss)
-                    dispatchDesc.MissShaderTable.StartAddress = runtimeData.m_shaderTableMiss->GetGPUVirtualAddress();
-                dispatchDesc.MissShaderTable.SizeInBytes = runtimeData.m_shaderTableMissSize;
-                dispatchDesc.MissShaderTable.StrideInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-
-                if (runtimeData.m_shaderTableHitGroup)
-                    dispatchDesc.HitGroupTable.StartAddress = runtimeData.m_shaderTableHitGroup->GetGPUVirtualAddress();
-                dispatchDesc.HitGroupTable.SizeInBytes = runtimeData.m_shaderTableHitGroupSize;
-                dispatchDesc.HitGroupTable.StrideInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
-
-                m_dxrCommandList->DispatchRays(&dispatchDesc);
-            }
+			m_dxrCommandList->DispatchRays(&dispatchDesc);
 		}
 
 		// publish SRVs and UAVs as viewable textures, after the shader execution

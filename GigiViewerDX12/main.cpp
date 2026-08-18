@@ -2629,7 +2629,7 @@ void SynchronizeSystemVariables()
             AssignVariable(g_systemVariables.CameraLeft_varName.c_str(), DataFieldType::Float3, cameraLeft);
             AssignVariable(g_systemVariables.CameraForward_varName.c_str(), DataFieldType::Float3, cameraFwd);
 
-            // Camera FOV, near plane and far plane
+            // Camera FOV, near plance and far plane
             AssignVariable(g_systemVariables.CameraFOV_varName.c_str(), DataFieldType::Float, g_systemVariables.camera.FOV);
             AssignVariable(g_systemVariables.CameraNearPlane_varName.c_str(), DataFieldType::Float, g_systemVariables.camera.nearPlane);
             AssignVariable(g_systemVariables.CameraFarPlane_varName.c_str(), DataFieldType::Float, g_systemVariables.camera.farPlane);

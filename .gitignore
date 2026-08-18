@@ -3,7 +3,6 @@
 **/enc_temp_folder/*
 **/Release/*
 **/out/**/*.obj
-**/out/**
 Debug-windows-x86_64/
 imgui.ini
 HostApps/OpenGL/bin-int/Debug-x64/*
