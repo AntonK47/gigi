@@ -616,6 +616,8 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 
 	if (nodeAction == NodeAction::Execute)
 	{
+        int varIndex = -1;
+        for (const auto& variable : m_renderGraph.variables)
         {
             varIndex++;
             if (varIndex >= GetRuntimeVariableCount())
@@ -623,6 +625,13 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
             const auto variableName = std::format("{}_GpuAddress", node.shader.name);
 
             if (variable.name == variableName && variable.type == DataFieldType::Uint_64)
+            {
+                auto& rtVar = GetRuntimeVariable(varIndex);
+
+                const auto value = runtimeData.m_shaderTableRayGen->GetGPUVirtualAddress();
+                memcpy(rtVar.storage.value, &value, rtVar.storage.size);
+            }
+        }
 		// publish SRVs and UAVs as viewable textures, before the shader execution
 		int depIndex = -1;
 		for (const ResourceDependency& dep : node.resourceDependencies)
