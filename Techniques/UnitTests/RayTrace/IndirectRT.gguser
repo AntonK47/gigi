@@ -5,7 +5,7 @@
     },
     "snapshot": {
         "resourceViewNodeIndex": 0,
-        "resourceViewResourceIndex": 6,
+        "resourceViewResourceIndex": 7,
         "importedResources": [
             {
                 "nodeName": "Scene",
@@ -26,12 +26,6 @@
                     "loadBufferAs": "Binary",
                     "structIndex": 0
                 }
-            }
-        ],
-        "savedVariables": [
-            {
-                "name": "IndirectRtRayGen_GpuAddress",
-                "value": "291524608"
             }
         ]
     }

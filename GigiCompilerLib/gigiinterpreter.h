@@ -37,6 +37,8 @@ public:
 		bool overrideValue = false;
 		bool systemValue = false;
 
+        bool internalOnInitValue = false;
+
 		bool isDefault() const
 		{
 			return memcmp(value, dflt, size) == 0;

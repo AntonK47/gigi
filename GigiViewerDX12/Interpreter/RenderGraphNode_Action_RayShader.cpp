@@ -612,26 +612,85 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 
 			soprops->Release();
 		}
+
+        int varIndex = -1;
+        for (auto& variable : m_renderGraph.variables)
+        {
+            varIndex++;
+            if (varIndex >= GetRuntimeVariableCount())
+                break;
+            const auto rayGenName = std::format("{}_RayGen_GpuAddress", node.shader.name);
+            const auto missTableName = std::format("{}_Miss_GpuAddress", node.shader.name);
+            const auto hitGroupName = std::format("{}_HitGroup_GpuAddress", node.shader.name);
+
+            if (variable.name == rayGenName && variable.type == DataFieldType::Uint_64)
+            {
+                auto& rtVar = GetRuntimeVariable(varIndex);
+                rtVar.storage.internalOnInitValue = true;
+                variable.Const = true;
+
+                const auto value = runtimeData.m_shaderTableRayGen->GetGPUVirtualAddress();
+                memcpy(rtVar.storage.value, &value, rtVar.storage.size);
+            }
+
+            if (variable.name == missTableName && variable.type == DataFieldType::Uint_64)
+            {
+                auto& rtVar = GetRuntimeVariable(varIndex);
+                rtVar.storage.internalOnInitValue = true;
+                variable.Const = true;
+
+                const auto value = runtimeData.m_shaderTableMiss->GetGPUVirtualAddress();
+                memcpy(rtVar.storage.value, &value, rtVar.storage.size);
+            }
+
+            if (variable.name == hitGroupName && variable.type == DataFieldType::Uint_64)
+            {
+                auto& rtVar = GetRuntimeVariable(varIndex);
+                rtVar.storage.internalOnInitValue = true;
+                variable.Const = true;
+
+                const auto value = runtimeData.m_shaderTableHitGroup->GetGPUVirtualAddress();
+                memcpy(rtVar.storage.value, &value, rtVar.storage.size);
+            }
+        }
 	}
 
 	if (nodeAction == NodeAction::Execute)
 	{
-        int varIndex = -1;
+        /*int varIndex = -1;
         for (const auto& variable : m_renderGraph.variables)
         {
             varIndex++;
             if (varIndex >= GetRuntimeVariableCount())
                 break;
-            const auto variableName = std::format("{}_GpuAddress", node.shader.name);
+            const auto rayGenName = std::format("{}_RayGen_GpuAddress", node.shader.name);
+            const auto missTableName = std::format("{}_Miss_GpuAddress", node.shader.name);
+            const auto hitGroupName = std::format("{}_HitGroup_GpuAddress", node.shader.name);
 
-            if (variable.name == variableName && variable.type == DataFieldType::Uint_64)
+            if (variable.name == rayGenName && variable.type == DataFieldType::Uint_64)
             {
                 auto& rtVar = GetRuntimeVariable(varIndex);
 
                 const auto value = runtimeData.m_shaderTableRayGen->GetGPUVirtualAddress();
                 memcpy(rtVar.storage.value, &value, rtVar.storage.size);
             }
-        }
+
+           if (variable.name == missTableName && variable.type == DataFieldType::Uint_64)
+            {
+                auto& rtVar = GetRuntimeVariable(varIndex);
+
+                const auto value = runtimeData.m_shaderTableMiss->GetGPUVirtualAddress();
+                memcpy(rtVar.storage.value, &value, rtVar.storage.size);
+            }
+
+            if (variable.name == hitGroupName && variable.type == DataFieldType::Uint_64)
+            {
+                auto& rtVar = GetRuntimeVariable(varIndex);
+
+                const auto value = runtimeData.m_shaderTableHitGroup->GetGPUVirtualAddress();
+                memcpy(rtVar.storage.value, &value, rtVar.storage.size);
+            } 
+        }*/
 		// publish SRVs and UAVs as viewable textures, before the shader execution
 		int depIndex = -1;
 		for (const ResourceDependency& dep : node.resourceDependencies)
@@ -799,6 +858,10 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
 				return false;
 			}
 
+            m_dxrCommandList->SetComputeRootSignature(runtimeData.m_rootSignature);
+            m_dxrCommandList->SetPipelineState1(runtimeData.m_stateObject);
+            m_dxrCommandList->SetComputeRootDescriptorTable(0, descriptorTable);
+
             if (node.enableIndirect)
             {
                 bool indirectCountBufferExists = false;
@@ -862,7 +925,7 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
                 {
                     m_transitions.Transition(TRANSITION_DEBUG_INFO(indirectCountBufferResource, D3D12_RESOURCE_STATE_INDIRECT_ARGUMENT));
                 }
-                m_transitions.Flush(m_commandList);
+                m_transitions.Flush(m_dxrCommandList);
 
                 // Get the indirect count buffer offset
                 UINT64 argumentCountBufferOffset = node.indirectExecution.indirectCountOffset.value;
@@ -903,10 +966,7 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
                     }
                 }
                 
-                m_dxrCommandList->SetComputeRootSignature(runtimeData.m_rootSignature);
-                m_dxrCommandList->SetPipelineState1(runtimeData.m_stateObject);
-                m_dxrCommandList->SetComputeRootDescriptorTable(0, descriptorTable);
-                m_commandList->ExecuteIndirect(
+                m_dxrCommandList->ExecuteIndirect(
                     runtimeData.m_commandSignature,
                     maxCommandCount,
                     indirectArgumentBufferResource,
@@ -916,19 +976,15 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
             }
             else
             {
-                m_dxrCommandList->SetComputeRootSignature(runtimeData.m_rootSignature);
-                m_dxrCommandList->SetPipelineState1(runtimeData.m_stateObject);
-                m_dxrCommandList->SetComputeRootDescriptorTable(0, descriptorTable);
-
                 D3D12_DISPATCH_RAYS_DESC dispatchDesc = {};
-                dispatchDesc.Width = dispatchSize[0];
-                dispatchDesc.Height = dispatchSize[1];
-                dispatchDesc.Depth = dispatchSize[2];
+                dispatchDesc.Width = 1; dispatchSize[0];
+                dispatchDesc.Height = 1; dispatchSize[1];
+                dispatchDesc.Depth = 1; dispatchSize[2];
 
                 dispatchDesc.RayGenerationShaderRecord.StartAddress = runtimeData.m_shaderTableRayGen->GetGPUVirtualAddress();
-                dispatchDesc.RayGenerationShaderRecord.SizeInBytes = D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT;
+                dispatchDesc.RayGenerationShaderRecord.SizeInBytes = 32;// D3D12_RAYTRACING_SHADER_TABLE_BYTE_ALIGNMENT;
 
-                if (runtimeData.m_shaderTableMiss)
+                /*if (runtimeData.m_shaderTableMiss)
                     dispatchDesc.MissShaderTable.StartAddress = runtimeData.m_shaderTableMiss->GetGPUVirtualAddress();
                 dispatchDesc.MissShaderTable.SizeInBytes = runtimeData.m_shaderTableMissSize;
                 dispatchDesc.MissShaderTable.StrideInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
@@ -936,7 +992,7 @@ bool GigiInterpreterPreviewWindowDX12::OnNodeAction(const RenderGraphNode_Action
                 if (runtimeData.m_shaderTableHitGroup)
                     dispatchDesc.HitGroupTable.StartAddress = runtimeData.m_shaderTableHitGroup->GetGPUVirtualAddress();
                 dispatchDesc.HitGroupTable.SizeInBytes = runtimeData.m_shaderTableHitGroupSize;
-                dispatchDesc.HitGroupTable.StrideInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;
+                dispatchDesc.HitGroupTable.StrideInBytes = D3D12_SHADER_IDENTIFIER_SIZE_IN_BYTES;*/
 
                 m_dxrCommandList->DispatchRays(&dispatchDesc);
             }

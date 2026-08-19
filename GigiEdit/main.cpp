@@ -2031,8 +2031,40 @@ struct Example :
                 }
 
                 ShowUIToolTip("Add all the system variables that the viewer can use.");
+
+                ImGui::SameLine();
+                if (ImGui::SmallButton("Add RT Record Vars"))
+                {
+                    for (const auto& shader : g_renderGraph.shaders)
+                    {
+                        if (shader.type == ShaderType::RTRayGen)
+                        {
+                            {
+                                char variableName[1024];
+                                sprintf_s(variableName, "%s_RayGen_GpuAddress", shader.name.c_str());
+
+                                Example::s_thisExample->EnsureSystemVariableExists(variableName, VariableVisibility::Internal, DataFieldType::Uint_64, "0");
+                            }
+                            {
+                                char variableName[1024];
+                                sprintf_s(variableName, "%s_Miss_GpuAddress", shader.name.c_str());
+
+                                Example::s_thisExample->EnsureSystemVariableExists(variableName, VariableVisibility::Internal, DataFieldType::Uint_64, "0");
+                            }
+                            {
+                                char variableName[1024];
+                                sprintf_s(variableName, "%s_HitGroup_GpuAddress", shader.name.c_str());
+
+                                Example::s_thisExample->EnsureSystemVariableExists(variableName, VariableVisibility::Internal, DataFieldType::Uint_64, "0");
+                            }
+                        }
+                    }
+                }
+                ShowUIToolTip("Add all RtRayShader and STB miss and hig group address as variables.");
             }
         ;
+
+        //auto AddRtRecordsButton()
 
         Variable newItem;
         newItem.name = "NewVariable";

@@ -11,8 +11,18 @@
             "type": "Float3"
         },
         {
-            "name": "IndirectRtRayGen_GpuAddress",
+            "name": "IndirectRtRayGen_RayGen_GpuAddress",
             "type": "Uint_64"
+        },
+        {
+            "name": "IndirectRtRayGen_Miss_GpuAddress",
+            "type": "Uint_64",
+            "dflt": "0"
+        },
+        {
+            "name": "IndirectRtRayGen_HitGroup_GpuAddress",
+            "type": "Uint_64",
+            "dflt": "0"
         }
     ],
     "shaders": [
@@ -32,7 +42,17 @@
                     }
                 },
                 {
-                    "name": "IndirectBufferAndCount",
+                    "name": "IndirectBuffer",
+                    "access": "UAV",
+                    "type": "Buffer",
+                    "buffer": {
+                        "type": "Uint",
+                        "raw": true,
+                        "PODAsStructuredBuffer": false
+                    }
+                },
+                {
+                    "name": "IndirectCount",
                     "access": "UAV",
                     "type": "Buffer",
                     "buffer": {
@@ -170,18 +190,15 @@
                 },
                 "indirectExecution": {
                     "indirectBuffer": {
-                        "node": "Node 8",
-                        "pin": "Pin"
+                        "node": "IndirectRT_Fill",
+                        "pin": "IndirectBuffer"
                     },
                     "indirectCountBuffer": {
-                        "node": "Node 7",
-                        "pin": "Pin"
+                        "node": "IndirectRT_Fill",
+                        "pin": "IndirectCount"
                     },
                     "indirectMaxCount": {
                         "value": 3
-                    },
-                    "indirectOffset": {
-                        "value": 1
                     }
                 },
                 "enableIndirect": true
@@ -191,10 +208,11 @@
             "actionComputeShader": {
                 "name": "IndirectRT_Fill",
                 "editorPos": [
-                    -581.0,
+                    -571.0,
                     194.0
                 ],
                 "linkProperties": [
+                    {},
                     {},
                     {}
                 ],
@@ -205,8 +223,13 @@
                         "dstPin": "Pin"
                     },
                     {
-                        "srcPin": "IndirectBufferAndCount",
+                        "srcPin": "IndirectBuffer",
                         "dstNode": "Node 14",
+                        "dstPin": "Pin"
+                    },
+                    {
+                        "srcPin": "IndirectCount",
+                        "dstNode": "Node 16",
                         "dstPin": "Pin"
                     }
                 ],
@@ -279,7 +302,7 @@
         },
         {
             "resourceBuffer": {
-                "name": "IndirectBufferAndCount",
+                "name": "IndirectBuffer",
                 "editorPos": [
                     -998.0,
                     98.0
@@ -296,7 +319,7 @@
             "resourceBuffer": {
                 "name": "IndirectRtData",
                 "editorPos": [
-                    -948.0,
+                    -980.0,
                     34.0
                 ],
                 "format": {
@@ -305,25 +328,6 @@
                 "count": {
                     "multiply": 256
                 }
-            }
-        },
-        {
-            "reroute": {
-                "name": "Node 1",
-                "editorPos": [
-                    -310.0,
-                    232.0
-                ],
-                "linkProperties": [
-                    {}
-                ],
-                "connections": [
-                    {
-                        "srcPin": "Pin",
-                        "dstNode": "IndirectRT_Fill",
-                        "dstPin": "IndirectBufferAndCount"
-                    }
-                ]
             }
         },
         {
@@ -423,44 +427,6 @@
         },
         {
             "reroute": {
-                "name": "Node 7",
-                "editorPos": [
-                    -101.0,
-                    117.0
-                ],
-                "linkProperties": [
-                    {}
-                ],
-                "connections": [
-                    {
-                        "srcPin": "Pin",
-                        "dstNode": "Node 1",
-                        "dstPin": "Pin"
-                    }
-                ]
-            }
-        },
-        {
-            "reroute": {
-                "name": "Node 8",
-                "editorPos": [
-                    -175.0,
-                    98.0
-                ],
-                "linkProperties": [
-                    {}
-                ],
-                "connections": [
-                    {
-                        "srcPin": "Pin",
-                        "dstNode": "Node 1",
-                        "dstPin": "Pin"
-                    }
-                ]
-            }
-        },
-        {
-            "reroute": {
                 "name": "Node 9",
                 "editorPos": [
                     -315.0,
@@ -548,7 +514,7 @@
                 "connections": [
                     {
                         "srcPin": "Pin",
-                        "dstNode": "IndirectBufferAndCount",
+                        "dstNode": "IndirectBuffer",
                         "dstPin": "resource"
                     }
                 ]
@@ -591,6 +557,56 @@
                     }
                 ]
             }
+        },
+        {
+            "resourceBuffer": {
+                "name": "IndirectCount",
+                "editorPos": [
+                    -997.0,
+                    162.0
+                ],
+                "format": {
+                    "type": "Uint"
+                }
+            }
+        },
+        {
+            "reroute": {
+                "name": "Node 16",
+                "editorPos": [
+                    -747.0,
+                    251.0
+                ],
+                "linkProperties": [
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "Pin",
+                        "dstNode": "Node 17",
+                        "dstPin": "Pin"
+                    }
+                ]
+            }
+        },
+        {
+            "reroute": {
+                "name": "Node 17",
+                "editorPos": [
+                    -859.0,
+                    181.0
+                ],
+                "linkProperties": [
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "Pin",
+                        "dstNode": "IndirectCount",
+                        "dstPin": "resource"
+                    }
+                ]
+            }
         }
     ],
     "hitGroups": [
@@ -603,5 +619,8 @@
                 "name": "IndirectRtAnyHit"
             }
         }
-    ]
+    ],
+    "PrimaryOutput": {
+        "name": "Output"
+    }
 }

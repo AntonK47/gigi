@@ -67,28 +67,28 @@ struct DispatchRaysArgs
 		IndirectRtData.Store(sizeof(IndirectData), d2);
 
 		DispatchRaysArgs arg1 = (DispatchRaysArgs)0;
-		arg1.rayGenerationRecord.startAddress = /*$(Variable:IndirectRtRayGen_GpuAddress)*/;
+		arg1.rayGenerationRecord.startAddress = /*$(Variable:IndirectRtRayGen_RayGen_GpuAddress)*/;
 		arg1.rayGenerationRecord.sizeInBytes = 64;
 		arg1.width = 64;
 		arg1.height = 64;
 		arg1.depth = 1;
 
 		DispatchRaysArgs arg2 = (DispatchRaysArgs)0;
-		arg2.rayGenerationRecord.startAddress = /*$(Variable:IndirectRtRayGen_GpuAddress)*/;
+		arg2.rayGenerationRecord.startAddress = /*$(Variable:IndirectRtRayGen_RayGen_GpuAddress)*/;
 		arg2.rayGenerationRecord.sizeInBytes = 64;
 		arg2.width = 128;
 		arg2.height = 128;
 		arg2.depth = 1;
-
-
-		IndirectBufferAndCount.Store<uint>(0, 2);
-		IndirectBufferAndCount.Store<DispatchRaysArgs>(sizeof(uint), arg1);
-		IndirectBufferAndCount.Store<DispatchRaysArgs>(sizeof(uint) + sizeof(DispatchRaysArgs), arg2);
+///*$(Variable:IndirectRtRayGen_RayGen_GpuAddress)*/ == 0 ? 0:
+		IndirectCount.Store<uint>(0,  2);
+		IndirectBuffer.Store<DispatchRaysArgs>(0, arg1);
+		IndirectBuffer.Store<DispatchRaysArgs>(sizeof(DispatchRaysArgs), arg2);
 	}
 }
 
 /*
 Shader Resources:
 	Buffer IndirectRtData (as UAV)
-	Buffer IndirectBufferAndCount (as UAV)
+	Buffer IndirectBuffer (as UAV)
+	Buffer IndirectCount (as UAV)
 */

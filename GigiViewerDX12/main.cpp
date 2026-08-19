@@ -175,6 +175,7 @@ static float g_histogramMinMax[2] = { 0.0f, 1.0f };
 static float g_imageZoom = 1.0f;
 static bool g_imageLinearFilter = true;
 
+
 enum class SRGBSettings : int
 {
     Auto = 0,
@@ -1429,15 +1430,17 @@ bool LoadGGFile(const char* fileName, bool preserveState, bool addToRecentFiles)
     // Set all const variables to their const value
     for (const Variable& variable : g_interpreter.GetRenderGraph().variables)
     {
-        if (!variable.Const)
-            continue;
-
         int rtVarIndex = g_interpreter.GetRuntimeVariableIndex(variable.name.c_str());
+
         if (rtVarIndex == -1)
             continue;
 
-        const Variable& variable = *g_interpreter.GetRuntimeVariable(rtVarIndex).variable;
-        g_interpreter.SetRuntimeVariableFromString(rtVarIndex, variable.dflt.c_str());
+        const auto& rtVar = g_interpreter.GetRuntimeVariable(rtVarIndex);
+
+        if (!variable.Const || (variable.Const && rtVar.storage.internalOnInitValue))
+            continue;
+        
+        g_interpreter.SetRuntimeVariableFromString(rtVarIndex, rtVar.variable->dflt.c_str());
     }
 
     // Reset any variables that are marked transient
@@ -1462,7 +1465,7 @@ bool LoadGGFile(const char* fileName, bool preserveState, bool addToRecentFiles)
             continue;
 
         auto& rtVar = g_interpreter.GetRuntimeVariable(rtVarIndex);
-        if (rtVar.storage.overrideValue || rtVar.variable->transient)
+        if (rtVar.storage.overrideValue || rtVar.variable->transient || rtVar.storage.internalOnInitValue)
             continue;
 
         g_interpreter.SetRuntimeVariableToDflt(rtVarIndex);
@@ -10470,6 +10473,7 @@ bool CreateDeviceD3D(HWND hWnd)
 
     // Create device
     {
+
         const D3D_FEATURE_LEVEL featureLevels[] =
         {
             D3D_FEATURE_LEVEL_12_2,
