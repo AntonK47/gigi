@@ -4,6 +4,7 @@
 **/Release/*
 **/out/**/*.obj
 **/out/**
+ShaderDebugInfo/**
 Debug-windows-x86_64/
 imgui.ini
 HostApps/OpenGL/bin-int/Debug-x64/*

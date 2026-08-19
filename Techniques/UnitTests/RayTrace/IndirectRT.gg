@@ -123,6 +123,18 @@
             "type": "RTAnyHit",
             "entryPoint": "IndirectRtAnyHit",
             "copyFile": false
+        },
+        {
+            "name": "IndirectRt_Clear",
+            "fileName": "IndirectRt_Clear.hlsl",
+            "entryPoint": "IndirectRt_Clear",
+            "resources": [
+                {
+                    "name": "RenderTarget",
+                    "access": "UAV",
+                    "type": "Texture"
+                }
+            ]
         }
     ],
     "structs": [
@@ -145,7 +157,7 @@
     "nodes": [
         {
             "actionRayShader": {
-                "name": "Do RT",
+                "name": "DoRT",
                 "editorPos": [
                     -21.0,
                     3.0
@@ -190,15 +202,15 @@
                 },
                 "indirectExecution": {
                     "indirectBuffer": {
-                        "node": "IndirectRT_Fill",
-                        "pin": "IndirectBuffer"
+                        "node": "Node 1",
+                        "pin": "Pin"
                     },
                     "indirectCountBuffer": {
-                        "node": "IndirectRT_Fill",
-                        "pin": "IndirectCount"
+                        "node": "Node 7",
+                        "pin": "Pin"
                     },
                     "indirectMaxCount": {
-                        "value": 3
+                        "value": 32
                     }
                 },
                 "enableIndirect": true
@@ -242,7 +254,7 @@
             "resourceTexture": {
                 "name": "Output",
                 "editorPos": [
-                    -517.0,
+                    -597.0,
                     -62.0
                 ],
                 "format": {
@@ -311,7 +323,7 @@
                     "type": "Uint"
                 },
                 "count": {
-                    "multiply": 256
+                    "multiply": 4096
                 }
             }
         },
@@ -326,7 +338,7 @@
                     "type": "Uint"
                 },
                 "count": {
-                    "multiply": 256
+                    "multiply": 4096
                 }
             }
         },
@@ -438,8 +450,8 @@
                 "connections": [
                     {
                         "srcPin": "Pin",
-                        "dstNode": "Output",
-                        "dstPin": "resource"
+                        "dstNode": "IndirectRT_Clear",
+                        "dstPin": "RenderTarget"
                     }
                 ]
             }
@@ -606,6 +618,109 @@
                         "dstPin": "resource"
                     }
                 ]
+            }
+        },
+        {
+            "reroute": {
+                "name": "Node 1",
+                "editorPos": [
+                    -138.0,
+                    98.0
+                ],
+                "linkProperties": [
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "Pin",
+                        "dstNode": "Node 18",
+                        "dstPin": "Pin"
+                    }
+                ]
+            }
+        },
+        {
+            "reroute": {
+                "name": "Node 7",
+                "editorPos": [
+                    -97.0,
+                    118.0
+                ],
+                "linkProperties": [
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "Pin",
+                        "dstNode": "Node 8",
+                        "dstPin": "Pin"
+                    }
+                ]
+            }
+        },
+        {
+            "reroute": {
+                "name": "Node 8",
+                "editorPos": [
+                    -252.0,
+                    251.0
+                ],
+                "linkProperties": [
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "Pin",
+                        "dstNode": "IndirectRT_Fill",
+                        "dstPin": "IndirectCount"
+                    }
+                ]
+            }
+        },
+        {
+            "reroute": {
+                "name": "Node 18",
+                "editorPos": [
+                    -303.0,
+                    232.0
+                ],
+                "linkProperties": [
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "Pin",
+                        "dstNode": "IndirectRT_Fill",
+                        "dstPin": "IndirectBuffer"
+                    }
+                ]
+            }
+        },
+        {
+            "actionComputeShader": {
+                "name": "IndirectRT_Clear",
+                "editorPos": [
+                    -491.0,
+                    -62.0
+                ],
+                "linkProperties": [
+                    {}
+                ],
+                "connections": [
+                    {
+                        "srcPin": "RenderTarget",
+                        "dstNode": "Output",
+                        "dstPin": "resource"
+                    }
+                ],
+                "shader": {
+                    "name": "IndirectRt_Clear"
+                },
+                "dispatchSize": {
+                    "node": {
+                        "name": "Output"
+                    }
+                }
             }
         }
     ],

@@ -26,17 +26,17 @@ struct IndirectData
 {
 	uint dispatchIndex = /*$(DispatchIndex)*/;
 
-	IndirectData d = IndirectRtData.Load<IndirectData>(dispatchIndex * sizeof(IndirectData));
+	IndirectData indirectData = IndirectRtData.Load<IndirectData>(dispatchIndex * sizeof(IndirectData));
 
 	uint2 dispatchRaysIndex = DispatchRaysIndex().xy;
-	if(dispatchRaysIndex.x > d.rect.w || dispatchRaysIndex.y > d.rect.h)
+	if(dispatchRaysIndex.x > indirectData.rect.w || dispatchRaysIndex.y > indirectData.rect.h)
 	{
 		return;
 	}
 	
-	uint2 px = uint2(d.rect.x, d.rect.y) + dispatchRaysIndex;
-	/*
-	uint2 dimensions = DispatchRaysDimensions().xy;
+	uint2 px = uint2(indirectData.rect.x, indirectData.rect.y) + dispatchRaysIndex;
+	
+	uint2 dimensions = uint2(256, 256);
 
 	float2 screenPos = (float2(px)+0.5f) / dimensions * 2.0 - 1.0;
 	screenPos.y = -screenPos.y;
@@ -60,10 +60,8 @@ struct IndirectData
 		/*$(RTMissIndex:IndirectRtMiss)*/,
 		ray,
 		payload);
-	Output[px] = float4(payload.hit ? payload.color : float3(0.2f, 0.2f, 0.2f), 1.0f);
-	*/
-
-	Output[px] = d.color;
+	
+	Output[px] = float4(payload.hit ? payload.color : indirectData.color.rgb, 1.0f);
 }
 
 /*$(_miss:IndirectRtMiss)*/
@@ -73,19 +71,19 @@ struct IndirectData
 
 /*$(_closesthit:IndirectRtCloasestHit)*/
 {
+	float2 bary = intersection.barycentrics;
+
+	float3 normal0 = SceneVertexBuffer[PrimitiveIndex()*3 + 0].Normal;
+	float3 normal1 = SceneVertexBuffer[PrimitiveIndex()*3 + 1].Normal;
+	float3 normal2 = SceneVertexBuffer[PrimitiveIndex()*3 + 2].Normal;
+	float3 normal = normal0 + bary.x * (normal1 - normal0) + bary.y * (normal2 - normal0);
+	normal = normalize(normal);
+	payload.color = normal * 0.5f + 0.5f;
 	payload.hit = true;
 }
 
 /*$(_anyhit:IndirectRtAnyHit)*/
 {
-	float3 hitLocation = ObjectRayOrigin() + ObjectRayDirection() * RayTCurrent();
-
-	float3 normal0 = SceneVertexBuffer[PrimitiveIndex()*3 + 0].Normal;
-	float3 normal1 = SceneVertexBuffer[PrimitiveIndex()*3 + 1].Normal;
-	float3 normal2 = SceneVertexBuffer[PrimitiveIndex()*3 + 2].Normal;
-	float3 normal = normal0 + attr.barycentrics.x * (normal1 - normal0) + attr.barycentrics.y * (normal2 - normal0);
-	normal = normalize(normal);
-	payload.color = normal * 0.5f + 0.5f;
 	payload.hit = true;
 }
 

@@ -43,46 +43,49 @@ struct DispatchRaysArgs
 {
 	if(DTid.x == 0)
 	{
-		Rectangle r1;
-		r1.x = 32;
-		r1.y = 32;
-		r1.w = 32;
-		r1.h = 64;
+		const uint tileSize = 32;
+		const uint outputSize = 256;
+		uint outputTilesInX = outputSize /tileSize;
+		uint outputDataIndex = 0;
 
-		IndirectData d1;
-		d1.rect = r1;
-		d1.color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+		for(uint x = 0; x < outputTilesInX; x++)
+		{
+			for(uint y = 0; y < outputTilesInX; y++)
+			{
+				if((x + y) % 2 == 0)
+				{
+					DispatchRaysArgs arg = (DispatchRaysArgs)0;
+					arg.rayGenerationRecord.startAddress = /*$(Variable:IndirectRtRayGen_RayGen_GpuAddress)*/;
+					arg.rayGenerationRecord.sizeInBytes = 64;
+					arg.missShaderTable.startAddress = /*$(Variable:IndirectRtRayGen_Miss_GpuAddress)*/;
+					arg.missShaderTable.sizeInBytes = 32;
+					arg.missShaderTable.strideInBytes = 32;
+					arg.hitGroupTable.startAddress = /*$(Variable:IndirectRtRayGen_HitGroup_GpuAddress)*/;
+					arg.hitGroupTable.sizeInBytes = 64;
+					arg.hitGroupTable.strideInBytes = 32;
+					arg.width = tileSize;
+					arg.height = tileSize;
+					arg.depth = 1;
 
-		Rectangle r2;
-		r2.x = 64;
-		r2.y = 96;
-		r2.w = 128;
-		r2.h = 64;
+					Rectangle rect;
+					rect.w = tileSize;
+					rect.h = tileSize;
+					rect.x = x * tileSize;
+					rect.y = y * tileSize;
 
-		IndirectData d2;
-		d2.rect = r2;
-		d2.color = float4(0.0f, 1.0f, 0.0f, 1.0f);
+					IndirectData indirectData;
+					indirectData.rect = rect;
+					indirectData.color = float4(0.0f, 1.0f / outputTilesInX * x, 1.0f / outputTilesInX * y, 1.0f);
 
-		IndirectRtData.Store(0, d1);
-		IndirectRtData.Store(sizeof(IndirectData), d2);
+					IndirectRtData.Store(outputDataIndex * sizeof(IndirectData), indirectData);
+					IndirectBuffer.Store<DispatchRaysArgs>(outputDataIndex * sizeof(DispatchRaysArgs), arg);
 
-		DispatchRaysArgs arg1 = (DispatchRaysArgs)0;
-		arg1.rayGenerationRecord.startAddress = /*$(Variable:IndirectRtRayGen_RayGen_GpuAddress)*/;
-		arg1.rayGenerationRecord.sizeInBytes = 64;
-		arg1.width = 64;
-		arg1.height = 64;
-		arg1.depth = 1;
+					outputDataIndex++;
+				}
+			}
+		}
 
-		DispatchRaysArgs arg2 = (DispatchRaysArgs)0;
-		arg2.rayGenerationRecord.startAddress = /*$(Variable:IndirectRtRayGen_RayGen_GpuAddress)*/;
-		arg2.rayGenerationRecord.sizeInBytes = 64;
-		arg2.width = 128;
-		arg2.height = 128;
-		arg2.depth = 1;
-///*$(Variable:IndirectRtRayGen_RayGen_GpuAddress)*/ == 0 ? 0:
-		IndirectCount.Store<uint>(0,  2);
-		IndirectBuffer.Store<DispatchRaysArgs>(0, arg1);
-		IndirectBuffer.Store<DispatchRaysArgs>(sizeof(DispatchRaysArgs), arg2);
+		IndirectCount.Store<uint>(0,  outputDataIndex);
 	}
 }
 

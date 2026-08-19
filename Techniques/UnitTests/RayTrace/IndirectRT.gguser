@@ -1,11 +1,31 @@
 {
     "version": "2.0",
     "systemVars": {
+        "camera": {
+            "startingCameraPos": [
+                -1.3518191576004029,
+                1.5046494007110596,
+                -2.3382833003997804
+            ],
+            "startingCameraAltitudeAzimuth": [
+                -0.24561807513237,
+                5.883185863494873
+            ]
+        },
         "ProjMtx_textureName": "Output"
     },
     "snapshot": {
         "resourceViewNodeIndex": 0,
         "resourceViewResourceIndex": 7,
+        "cameraPos": [
+            -1.3518191576004029,
+            1.5046494007110596,
+            -2.3382833003997804
+        ],
+        "cameraAltitudeAzimuth": [
+            -0.24561807513237,
+            5.883185863494873
+        ],
         "importedResources": [
             {
                 "nodeName": "Scene",
